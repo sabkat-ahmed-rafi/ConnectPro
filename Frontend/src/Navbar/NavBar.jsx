@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
+import useAuth from "../Hooks/useAuth";
 
 const NavBar = () => {
   const li = (
@@ -11,7 +12,8 @@ const NavBar = () => {
     </>
   );
 
-  const user = false;
+
+  const {user} = useAuth()
 
   return (
     <>
