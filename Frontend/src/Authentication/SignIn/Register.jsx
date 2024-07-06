@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 
 
 const Register = () => {
+
+
+
     return (
         <>
           <div className="hero bg-base-200 min-h-screen">
@@ -14,6 +17,7 @@ const Register = () => {
     </div>
     <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
       <form className="card-body">
+        <h1 className='text-3xl  font-bold text-center'>Login</h1>
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">Name</span>
@@ -39,7 +43,6 @@ const Register = () => {
             <p className="text-sm italic">Already have an account? <Link className='text-blue-600' to='/login'>Login</Link></p>
           </label>
       </form>
-      
     </div>
   </div>
 </div>  
