@@ -18,7 +18,7 @@ const Login = () => {
     return (
         <>
             <div className="hero bg-base-200 min-h-screen">
-  <div className="hero-content ">
+  <div className="hero-content">
     <div className="text-center lg:text-left">
     <Lottie className='lg:flex hidden' animationData={SignIn} loop={true} />
     </div>
