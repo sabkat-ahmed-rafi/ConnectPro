@@ -13,7 +13,7 @@ const NavBar = () => {
   );
 
 
-  const {user} = useAuth()
+  const {user, logout} = useAuth()
 
   return (
     <>
@@ -68,7 +68,7 @@ const NavBar = () => {
                 <div className="w-12 rounded-full">
                   <img
                     alt="Profile Picture"
-                    src="noPhoto.jpg" />
+                    src={user.photoURL ? user.photoURL : "noPhoto.jpg"} />
                 </div>
               </div>
               <ul
@@ -76,7 +76,7 @@ const NavBar = () => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-md">
                 <li><Link to={'/profile'}>Profile</Link></li>
                 <li><Link to={'/settings'}>Settings</Link></li>
-                <li><Link >Logout</Link></li>
+                <li><Link onClick={() => logout()} >Logout</Link></li>
               </ul>
             </div>
            : <div className="space-x-5 ">
