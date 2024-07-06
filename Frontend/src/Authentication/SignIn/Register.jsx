@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Lottie from "lottie-react";
 import SignIn from "../../../public/signIn.json"
 import { Link } from 'react-router-dom';
 import { useForm } from "react-hook-form"
+import useAuth from '../../Hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 
 
@@ -15,7 +18,22 @@ const Register = () => {
   } = useForm()
 
 
-  const onSubmit = (data) => console.log(data)
+  const {createUser, updateUser} = useAuth()
+  const navigate = useNavigate()
+
+  const onSubmit = async (data) => {
+    const { name, email, password } = data
+    
+    try{
+      await createUser(email, password)
+      await updateUser(name)
+      toast.success('Account created successfully!')
+      navigate('/')
+    }catch(error) {
+      console.log(error.message)
+    }
+
+  }
 
 
     return (
