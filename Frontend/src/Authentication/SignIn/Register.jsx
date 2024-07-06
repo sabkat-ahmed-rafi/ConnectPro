@@ -17,7 +17,7 @@ const Register = () => {
     </div>
     <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
       <form className="card-body">
-        <h1 className='text-3xl  font-bold text-center'>Login</h1>
+        <h1 className='text-3xl  font-bold text-center pb-2'>Create an account</h1>
         <div className="form-control">
           <label className="label">
             <span className="label-text font-semibold">Name</span>
