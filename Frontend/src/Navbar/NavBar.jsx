@@ -16,7 +16,7 @@ const NavBar = () => {
   return (
     <>
       <section className="pt-[20px] text-black">
-        <div className="navbar bg-base-100 shadow-lg shadow-sky-400  mx-auto rounded-lg border w-[85%] border-sky-400">
+        <div className="navbar bg-base-100 shadow-lg shadow-sky-400  mx-auto rounded-lg border lg:w-[85%] w-[90%] border-sky-400">
           <div className="navbar-start">
             <div className="dropdown">
               <div
