@@ -9,9 +9,6 @@ import Register from "./Authentication/SignIn/Register";
 import Authentication from "./Authentication/Authentication";
 import { Toaster } from "react-hot-toast";
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";

@@ -1,8 +1,11 @@
 import React from 'react';
 import Lottie from "lottie-react";
 import SignIn from "../../../public/signIn.json"
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form"
+import { FcGoogle } from 'react-icons/fc';
+import useAuth from '../../Hooks/useAuth';
+import toast from 'react-hot-toast';
 
 const Login = () => {
 
@@ -11,9 +14,25 @@ const Login = () => {
         handleSubmit,
         formState: { errors },
       } = useForm()
+
+      const navigate = useNavigate()
+      const {googleLogin, setLoading} = useAuth()
     
     
       const onSubmit = (data) => console.log(data)
+
+
+      const handleGoogleLogIn = async () => {
+        try{
+          const {user} = await googleLogin()
+          navigate("/");
+          console.log(user);
+        }catch(error){
+          console.log(error.message);
+          setLoading(false);
+          toast.error(error.message);
+        }
+      };
 
     return (
         <>
@@ -42,10 +61,19 @@ const Login = () => {
         <div className="form-control mt-6">
           <button className="font-semibold rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300">Sign up</button>
         </div>
-        <label className="label">
-            <p className="text-sm italic text-slate-500">Haven't any account? <Link className='text-blue-600' to='/register'>Create</Link></p>
-          </label>
       </form>
+      <div className="text-center">
+              <button
+                onClick={handleGoogleLogIn}
+                className="btn lg:w-[320px] w-[250px] font-bold"
+              >
+                <FcGoogle className="text-2xl" />
+                Google
+              </button>
+            </div>
+                <p className="text-sm italic text-slate-500 text-center py-3">
+                  Haven't any account? <Link className='text-blue-600' to='/register'>Create</Link>
+                </p>
     </div>
   </div>
           </div>
