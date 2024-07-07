@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { FcGoogle } from 'react-icons/fc';
 import useAuth from '../../Hooks/useAuth';
 import toast from 'react-hot-toast';
+import { ImSpinner3 } from 'react-icons/im';
 
 const Login = () => {
 
@@ -16,10 +17,23 @@ const Login = () => {
       } = useForm()
 
       const navigate = useNavigate()
-      const {googleLogin, setLoading} = useAuth()
+      const {googleLogin, login, setLoading, loading} = useAuth()
     
     
-      const onSubmit = (data) => console.log(data)
+      const onSubmit = async (data) => {
+        const { email, password } = data;
+
+        try {
+          await login(email, password);
+          toast.success("Login successfully!");
+          navigate("/");
+        } catch (error) {
+          console.log(error.message);
+          setLoading(false);
+          toast.error("Invalid Credentials");
+    
+        }
+      }
 
 
       const handleGoogleLogIn = async () => {
@@ -59,7 +73,11 @@ const Login = () => {
           {errors.password && <span className='text-red-600 pt-2'>Password is required</span>}
         </div>
         <div className="form-control mt-6">
-          <button className="font-semibold rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300">Sign up</button>
+          <button className="font-semibold rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300">{loading ? (
+                    <ImSpinner3 className="animate-spin mx-auto text-white size-6" />
+                  ) : (
+                    "Login"
+                  )}</button>
         </div>
       </form>
       <div className="text-center">
