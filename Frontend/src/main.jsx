@@ -7,8 +7,16 @@ import Home from "./Components/Home";
 import Login from "./Authentication/Login/Login";
 import Register from "./Authentication/SignIn/Register";
 import Authentication from "./Authentication/Authentication";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -33,9 +41,18 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Authentication>
-    <Toaster position="bottom-right" />
-      <RouterProvider router={router} />
-    </Authentication>
+    <QueryClientProvider client={queryClient}>
+      <Authentication>
+        <Toaster position="bottom-right" />
+        <RouterProvider router={router} />
+      </Authentication>
+    </QueryClientProvider>
   </React.StrictMode>
 );
+
+
+
+
+
+
+// next time i have to made backend and connect database and add jwt authorization
