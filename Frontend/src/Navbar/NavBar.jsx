@@ -12,8 +12,13 @@ const NavBar = () => {
     </>
   );
 
-
+  
   const {user, logout} = useAuth()
+
+
+  const handleLogOut = () => {
+    logout();
+  }
 
   return (
     <>
@@ -76,7 +81,7 @@ const NavBar = () => {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-md">
                 <li><Link to={'/profile'}>Profile</Link></li>
                 <li><Link to={'/settings'}>Settings</Link></li>
-                <li><Link onClick={() => logout()} >Logout</Link></li>
+                <li><Link onClick={handleLogOut} >Logout</Link></li>
               </ul>
             </div>
            : <div className="space-x-5 ">
