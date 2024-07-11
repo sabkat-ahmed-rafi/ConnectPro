@@ -1,15 +1,22 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const app = express();
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 
 
-// sabkatahmedrafi
-// lftQ1YfVANB10LAo
-
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  Credential: true,
+  optionSuccessStatus: 200
+  })
+);
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -27,14 +34,43 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     
-    // Connect the client to the server	(optional starting in v4.7)
+    // Creating token and saving it to the cookies in browser 
+    app.post("/jwt" , async (req, res) => {
+
+      const user = req.body;
+
+      const token = jwt.sign(user, process.env.TOKEN, { expiresIn: '365d' });
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      }).send({ success: true });
+    })
+    // Removing a token from browser after a user logouts 
+    app.get('/logout', async (req, res) => {
+      try {
+        res.clearCookie("token", {
+          maxAge: 0,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        })
+      }catch(err) {
+        console.error("Error logging out: ", err);
+        return res.status(500).send(err);
+      }
+    })
+
+
+
+
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
