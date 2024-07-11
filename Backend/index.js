@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 app.use(cors({
   origin: ["http://localhost:5173"],
-  Credential: true,
+  credentials: true,
   optionSuccessStatus: 200
   })
 );
@@ -47,6 +47,8 @@ async function run() {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       }).send({ success: true });
     })
+
+    
     // Removing a token from browser after a user logouts 
     app.get('/logout', async (req, res) => {
       try {
@@ -54,7 +56,7 @@ async function run() {
           maxAge: 0,
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        })
+        }).send({ success: true });
       }catch(err) {
         console.error("Error logging out: ", err);
         return res.status(500).send(err);
@@ -64,10 +66,10 @@ async function run() {
 
 
 
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
