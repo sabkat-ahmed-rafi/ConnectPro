@@ -2,6 +2,7 @@ import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndP
 import React, { createContext, useEffect, useState } from 'react';
 import auth from './Firebase/firebase.init';
 import axios from 'axios';
+import socketIOClient from 'socket.io-client'
 
 
 export const AuthContext = createContext()
@@ -11,6 +12,7 @@ const Authentication = ({children}) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const googleProvider = new GoogleAuthProvider();
+    const [socket, setSocket] = useState(null);
 
 
 
@@ -42,8 +44,9 @@ const Authentication = ({children}) => {
     // Log out a signed in user 
     const logout = async () => {
         setLoading(true);
-        console.log("logout rafi")
         await axios.get(`${import.meta.env.VITE_BACKEND_URL}/logout`, { withCredentials: true })
+        socket && socket.disconnect();
+        setSocket(null)
         return signOut(auth)
     }
 
@@ -61,11 +64,31 @@ const Authentication = ({children}) => {
             if(currentUser) {
                 saveTokenToCookie(currentUser.email)
                 console.log(currentUser.email)
+
+                const socketInstance = socketIOClient(import.meta.env.VITE_BACKEND_URL)
+
+                socketInstance.on('connect', () => {
+                    console.log(`socket connected : ${socketInstance.id}`)
+                    // i can save other information of user in the database 
+                    socketInstance.emit('register', { uid: currentUser.uid })
+                })
+
+                setSocket(socketInstance);
+                
+            } else {
+                if(socket) {
+                    socket.disconnect();
+                    setSocket(null)
+                }
+                setLoading(false)
             }
-            setLoading(false)
         })
 
-        return () => unsubscribe()
+        return () => {
+            
+            unsubscribe()
+            if(socket) socket.disconnect();
+        }
     }, [])
 
     const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading}
