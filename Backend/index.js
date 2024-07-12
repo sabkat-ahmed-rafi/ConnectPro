@@ -19,6 +19,20 @@ app.use(cors({
 );
 
 
+const verifyToken = (req, res, next) => {
+  const token = req.cookies?.token
+  if(!token) return res.status(401).send({ message: "unauthorized access" })
+
+
+  jwt.verify(token, process.env.TOKEN, (err, decoded) => {
+    if(err) return res.status(403).send({ message: "unauthorized access" })
+      req.user = decoded;
+    next();
+  })
+
+}
+
+
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_KEY}@connectpro.44qlbv0.mongodb.net/?retryWrites=true&w=majority&appName=ConnectPro`;
 
@@ -33,6 +47,8 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+
+    // next time i have to add the verifyToken and axiosSecure to logout user after session expired 
     
     // Creating token and saving it to the cookies in browser 
     app.post("/jwt" , async (req, res) => {
