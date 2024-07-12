@@ -20,7 +20,6 @@ const NavBar = () => {
     logout();
   }
 
-  console.log(user?.photoURL);
 
   return (
     <>
