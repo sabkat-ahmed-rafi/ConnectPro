@@ -20,6 +20,8 @@ const NavBar = () => {
     logout();
   }
 
+  console.log(user?.photoURL);
+
   return (
     <>
       <section className="pt-[20px] text-black">
@@ -73,7 +75,7 @@ const NavBar = () => {
                 <div className="w-12 rounded-full">
                   <img
                     alt="Profile Picture"
-                    src={user.photoURL ? user.photoURL : "noPhoto.jpg"} />
+                    src={user?.photoURL || "noPhoto.jpg"} />
                 </div>
               </div>
               <ul
