@@ -103,6 +103,7 @@ async function run() {
     io.on("connection", (socket) => {
       console.log(`socket connected: ${socket.id}`)
 
+      // registering user with uid
       socket.on("register", async ({uid, email, userName}) => {
         console.log(`register user ${uid} with socket id: ${socket.id}`)
         await usersCollection.updateOne(
@@ -116,6 +117,16 @@ async function run() {
         )
 
         console.log(userName)
+      })
+
+
+      socket.on("private message", async ({recipientId, message}) => {
+        const sender = await usersCollection.findOne({socketId: socket.id});
+        const recipient = await usersCollection.findOne({uid: recipientId});
+
+        if(recipient && recipient.socketId) {
+          io.to(recipient.socketId).emit("private message", { sendersId: sender.uid, message });
+        }
       })
     
       socket.on("chat message", (msg) => {
