@@ -70,7 +70,11 @@ const Authentication = ({children}) => {
                 socketInstance.on('connect', () => {
                     console.log(`socket connected : ${socketInstance.id}`)
                     // i can save other information of user in the database 
-                    socketInstance.emit('register', { uid: currentUser.uid })
+                    socketInstance.emit('register', { 
+                        uid: currentUser.uid, 
+                        email: currentUser.email,
+                        userName: currentUser.displayName
+                     })
                 })
 
                 setSocket(socketInstance);

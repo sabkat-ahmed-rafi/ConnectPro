@@ -26,7 +26,9 @@ const Register = () => {
       await createUser(email, password);
       await updateUser(name);
       toast.success("Account created successfully!");
+      setLoading(false)
       navigate("/");
+      window.location.reload();
     } catch (error) {
       console.log(error.message);
       setLoading(false);
@@ -65,7 +67,7 @@ const Register = () => {
               </h1>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-semibold">Name</span>
+                  <span className="label-text font-semibold">User Name</span>
                 </label>
                 <input
                   {...register("name", { required: true })}

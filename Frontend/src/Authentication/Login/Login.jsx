@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Lottie from "lottie-react";
 import SignIn from "../../../public/signIn.json"
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,19 +17,22 @@ const Login = () => {
       } = useForm()
 
       const navigate = useNavigate()
-      const {googleLogin, login, setLoading, loading} = useAuth()
+      const {googleLogin, login} = useAuth()
+      const [loadingSpinner, setLoadingSpinner] = useState(false)
     
     
       const onSubmit = async (data) => {
         const { email, password } = data;
-
+        
         try {
+          setLoadingSpinner(true)
           await login(email, password);
           toast.success("Login successfully!");
+          setLoadingSpinner(false)
           navigate("/");
         } catch (error) {
           console.log(error.message);
-          setLoading(false);
+          setLoadingSpinner(false)
           toast.error("Invalid Credentials");
     
         }
@@ -38,12 +41,14 @@ const Login = () => {
 
       const handleGoogleLogIn = async () => {
         try{
+          setLoadingSpinner(true)
           const {user} = await googleLogin()
           navigate("/");
           console.log(user);
+          setLoadingSpinner(false)
         }catch(error){
           console.log(error.message);
-          setLoading(false);
+          setLoadingSpinner(false);
           toast.error(error.message);
         }
       };
@@ -73,7 +78,7 @@ const Login = () => {
           {errors.password && <span className='text-red-600 pt-2'>Password is required</span>}
         </div>
         <div className="form-control mt-6">
-          <button className="font-semibold rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300">{loading ? (
+          <button className="font-semibold rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300">{loadingSpinner ? (
                     <ImSpinner3 className="animate-spin mx-auto text-white size-6" />
                   ) : (
                     "Login"
