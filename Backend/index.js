@@ -103,13 +103,19 @@ async function run() {
     io.on("connection", (socket) => {
       console.log(`socket connected: ${socket.id}`)
 
-      socket.on("register", async ({uid}) => {
+      socket.on("register", async ({uid, email, userName}) => {
         console.log(`register user ${uid} with socket id: ${socket.id}`)
         await usersCollection.updateOne(
           {uid: uid},
-          { $set: {socketId: socket.id} },
+          { $set: {
+            socketId: socket.id,
+            email: email,
+           userName: userName
+          }},
           { upsert: true }
         )
+
+        console.log(userName)
       })
     
       socket.on("chat message", (msg) => {
