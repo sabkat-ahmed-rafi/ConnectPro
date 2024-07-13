@@ -95,7 +95,7 @@ const Authentication = ({children}) => {
         }
     }, [])
 
-    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading}
+    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket}
 
     return (
         <>

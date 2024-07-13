@@ -12,6 +12,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import Messages from "./Components/Messages/Messages";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/messages",
+        element: <Messages />,
       },
     ],
   },
@@ -48,8 +53,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 );
 
 
-
-
-
-
-// next time i have to made backend and connect database and add jwt authorization
