@@ -6,7 +6,7 @@ const NavBar = () => {
   const li = (
     <>
       <NavLink to={"/"}>Home</NavLink>
-      <NavLink to={"/messages"}>Messages</NavLink>
+      <NavLink to={"/inbox"}>Messages</NavLink>
       <NavLink to={"/about"}>about</NavLink>
       <NavLink to={"/contacts"}>contact</NavLink>
     </>

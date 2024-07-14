@@ -12,7 +12,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import Messages from "./Components/Messages/Messages";
+import Inbox from "./Components/Messages/Inbox";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +26,8 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/messages",
-        element: <Messages />,
+        path: "/inbox",
+        element: <Inbox />,
       },
     ],
   },
