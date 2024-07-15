@@ -62,6 +62,7 @@ const Authentication = ({children}) => {
             console.log(currentUser)
             setUser(currentUser)
             if(currentUser) {
+                setUser(currentUser)
                 saveTokenToCookie(currentUser.email)
                 console.log(currentUser.email)
 
@@ -73,7 +74,8 @@ const Authentication = ({children}) => {
                     socketInstance.emit('register', { 
                         uid: currentUser.uid, 
                         email: currentUser.email,
-                        userName: currentUser.displayName
+                        userName: currentUser.displayName,
+                        photo: currentUser.photoURL ? currentUser.photoURL : 'noPhoto.jpg'
                      })
                 })
 

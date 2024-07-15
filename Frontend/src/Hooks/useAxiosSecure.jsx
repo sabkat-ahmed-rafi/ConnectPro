@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import useAuth from "./useAuth";
 import { useNavigate } from 'react-router-dom'
+import axios from "axios";
 
 export const axiosSecure = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL,

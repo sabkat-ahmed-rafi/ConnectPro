@@ -97,6 +97,19 @@ async function run() {
       }
     })
 
+    // Getting all users for search 
+    app.get('/users', async (req, res) => {
+      const search = req.query.search
+
+      const query = { $or: [ 
+       { userName: { $regex: search, $options: 'i' } }
+      ] }
+
+      const users = await usersCollection.find(query).toArray();
+
+      res.send(users);
+    })
+
 
 
     // Socket.io events 
@@ -104,14 +117,15 @@ async function run() {
       console.log(`socket connected: ${socket.id}`)
 
       // registering user with uid
-      socket.on("register", async ({uid, email, userName}) => {
+      socket.on("register", async ({uid, email, userName, photo}) => {
         console.log(`register user ${uid} with socket id: ${socket.id}`)
         await usersCollection.updateOne(
           {uid: uid},
           { $set: {
             socketId: socket.id,
             email: email,
-           userName: userName
+           userName: userName,
+           photo: photo
           }},
           { upsert: true }
         )
