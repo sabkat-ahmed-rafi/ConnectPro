@@ -50,7 +50,7 @@ const verifyToken = (req, res, next) => {
 }
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_KEY}@connectpro.44qlbv0.mongodb.net/?retryWrites=true&w=majority&appName=ConnectPro`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -67,6 +67,7 @@ async function run() {
 
     const database = client.db("ConnectPro");
     const usersCollection = database.collection("users"); 
+    const conversationList = database.collection("conversations");
     
     // Creating token and saving it to the cookies in browser 
     app.post("/jwt" , async (req, res) => {
@@ -108,6 +109,37 @@ async function run() {
       const users = await usersCollection.find(query).toArray();
 
       res.send(users);
+    })
+
+    app.get('/userMessage/:uid', async (req, res) => {
+      const userId = req.params.uid;
+      const query = { uid: userId }
+      const user = await usersCollection.findOne(query);
+      if(!user) return res.status(404).send({ message: "User not found" })
+      res.send(user);
+    })
+
+    app.get('/conversations/:email', async (req, res) => {
+      const query = req.query.email
+      const conversations = await conversationList.find(query).toArray();
+      res.send(conversations);
+    })
+
+    app.post('/conversations', async (req, res) => {
+      const {uid, email, photo, socketId, userName, myEmail} = req.body;
+      const query = { email: email };
+      const conversation = {
+        uid, 
+        email,
+        photo,
+        socketId,
+        userName,
+        myEmail
+      }
+      const isExist = await conversationList.findOne(query);
+      if(isExist) return res.status(404).send({ message: "already exist" })
+      const result = await conversationList.insertOne(conversation);
+      res.send(result);
     })
 
 
