@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query"
 import { axiosSecure } from "../../Hooks/useAxiosSecure";
+import { Link } from "react-router-dom";
+import useAuth from "../../Hooks/useAuth";
 
 const MessageList = () => {
 
   const [search, setSearch] = useState('')
   const [userUid, setUserUid] = useState('')
+  const { user } = useAuth()
 
   const {data: allUsers = []} = useQuery({
     queryKey: ["userList", search],
@@ -15,9 +18,21 @@ const MessageList = () => {
     }
   })
 
+  const {data: conversations = []} = useQuery({
+    queryKey: ["conversations", user?.email],
+    queryFn: async () => {
+      const {data} = await axiosSecure.get(`/conversations/${user?.email}`)
+      return data
+    }
+  })
+
 
   // have to work on the search bar when a user will select a user from the search appearence i have to hide the appearence section 
 
+  const handleSaveConversation = async (item) => {
+    const {data} = await axiosSecure.post(`/conversations`, {...item, myEmail: user.email})
+    console.log(data)
+  }
  
   console.log(userUid)
 
@@ -25,26 +40,31 @@ const MessageList = () => {
     <>
       <section className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-sky-400 p-4  border-sky-400">
         <section className="mb-4">
-            <input onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
         </section>
-        <section className="">
-          <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 rounded-lg">
-            <img
-              alt="Tailwind CSS chat bubble component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-              className="w-12 lg:w-12 rounded-full hover:border-black"
-            />
-            <h1 className="text-[16px] text-white font-bold lg:flex hidden">Sabkat Ahmed Rafi</h1>
-          </div>
-        </section>
+       {
+        conversations.map((conversation) =>  <Link key={conversation._id} to={`/inbox/message/${conversation.uid}`} className="">
+        <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 rounded-lg">
+          <img
+            alt="Tailwind CSS chat bubble component"
+            src={conversation.photo}
+            className="w-12 lg:w-12 rounded-full hover:border-black"
+          />
+          <h1 className="text-[16px] text-white font-bold lg:flex hidden">{conversation.userName}</h1>
+        </div>
+      </Link>)
+       }
       </section>
 
-
+ {/* search appearence  */}
 <section className={`${search ? "visible" : "hidden"} w-[25%] lg:h-[302px] h-[280px] flex flex-col overflow-y-scroll absolute bg-white shadow-lg top-[150px] lg:top-[200px] left-[100px] lg:left-[200px] z-10 p-4 rounded-xl space-y-3`}>
 {
         allUsers.map(item => {
           return (
-            <section onClick={() => setUserUid(item.uid)}  key={item.uid} className="">
+            <Link to={`/inbox/message/${item.uid}`} onClick={() => {
+              setSearch('')
+              handleSaveConversation(item)
+ } }  key={item.uid} className="">
             <div className="flex lg:hover:bg-sky-300 hover:text-white transition-all duration-500 items-center lg:space-x-3 lg:px-3 lg:py-2 rounded-lg">
               <img
                 alt="Tailwind CSS chat bubble component"
@@ -53,7 +73,7 @@ const MessageList = () => {
               />
               <h1 className="text-[16px] text-black font-bold lg:flex hidden">{item.userName}</h1>
             </div>
-          </section>
+          </Link>
           )
         })
       }

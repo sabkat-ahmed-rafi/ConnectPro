@@ -1,7 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
+import { useLoaderData } from "react-router-dom";
+import useAuth from "../../Hooks/useAuth";
+
+
 
 const Message = () => {
+
+  const {socket} = useAuth()
+  const [messageInput, setMessageInput] = useState('')
+
+  const selectedUser = useLoaderData()
+  
+  
+  const recipientId = selectedUser.uid;
+  
+  // send message implemented but not checked it works or not 
+  const handleSendMessage = () => {
+    if(messageInput && socket) {
+      socket.emit("private message", {recipientId, message: messageInput})
+      console.log(socket)
+      console.log(messageInput)
+      setMessageInput('')
+    }
+    
+  }
+
+  const handleKeyPress = (event) => {
+    if(event.key === 'Enter') {
+      handleSendMessage();
+    }
+  }
+  
+  
   return (
     <>
       <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-sky-200">
@@ -11,15 +42,14 @@ const Message = () => {
     <div className="w-8 lg:w-10 rounded-full">
       <img
         alt="userImage"
-        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+        src={selectedUser.photo} />
     </div>
   </div>
   <div className="chat-header">
-    Obi-Wan Kenobi
-    <time className="text-xs opacity-50">12:45</time>
+    {selectedUser.userName}
+    <time className="text-xs opacity-50 pl-1">12:45</time>
   </div>
   <div className="chat-bubble bg-sky-400 text-white">You were the Chosen One!</div>
-  <div className="chat-footer opacity-50">Delivered</div>
 </div>
 <div className="chat chat-end">
   <div className="chat-image avatar">
@@ -34,16 +64,20 @@ const Message = () => {
     <time className="text-xs opacity-50">12:46</time>
   </div>
   <div className="chat-bubble bg-sky-400 text-white">I hate you!</div>
-  <div className="chat-footer opacity-50">Seen at 12:46</div>
         </div>
         </section>
         <section className="sticky bottom-0 py-2 pl-1 pr-4 rounded-md bg-sky-400 flex justify-end items-center space-x-4">
           <input
+            value={messageInput}
+            onKeyPress={handleKeyPress}
+            onChange={(e) => setMessageInput(e.target.value)}
             type="text"
             placeholder="Type here"
             className="input w-full rounded-[35px] lg:focus:mr-[200px] transition-all duration-500"
           />
-          <button className="active:text-white active:size-50 transition-all duration-300 ">
+          <button onClick={() => {
+            handleSendMessage();
+          }} className="active:text-white active:size-50 transition-all duration-300 ">
             <IoMdSend size={30} />
           </button>
         </section>

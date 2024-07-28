@@ -13,6 +13,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import Inbox from "./Components/Messages/Inbox";
+import Message from "./Components/Messages/Message";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,13 @@ const router = createBrowserRouter([
       {
         path: "/inbox",
         element: <Inbox />,
+        children: [
+          {
+            path: "/inbox/message/:uid",
+            element: <Message></Message>,
+            loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/userMessage/${params.uid}`)
+          },
+        ],
       },
     ],
   },
