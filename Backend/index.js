@@ -111,6 +111,7 @@ async function run() {
       res.send(users);
     })
 
+    // getting a user by uid for the user message view
     app.get('/userMessage/:uid', async (req, res) => {
       const userId = req.params.uid;
       const query = { uid: userId }
@@ -119,15 +120,19 @@ async function run() {
       res.send(user);
     })
 
+    // showing all user for the conversationList view 
     app.get('/conversations/:email', async (req, res) => {
-      const query = req.query.email
+      const email = req.params.email;
+      const query = { myEmail: email };
       const conversations = await conversationList.find(query).toArray();
       res.send(conversations);
     })
 
+    // creating a new conversation  for a user  in the conversationList view  
     app.post('/conversations', async (req, res) => {
       const {uid, email, photo, socketId, userName, myEmail} = req.body;
-      const query = { email: email };
+      if(email == myEmail) return res.status(200).send({message: "you can't send message to yourself"})
+      const query = { myEmail: myEmail };
       const conversation = {
         uid, 
         email,
@@ -148,7 +153,7 @@ async function run() {
     io.on("connection", (socket) => {
       console.log(`socket connected: ${socket.id}`)
 
-      // registering user with uid
+      // registering user with uid for socket connection
       socket.on("register", async ({uid, email, userName, photo}) => {
         console.log(`register user ${uid} with socket id: ${socket.id}`)
         await usersCollection.updateOne(
@@ -166,6 +171,7 @@ async function run() {
       })
 
 
+      // sending a private message 
       socket.on("private message", async ({recipientId, message}) => {
         const sender = await usersCollection.findOne({socketId: socket.id});
         const recipient = await usersCollection.findOne({uid: recipientId});
