@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { useLoaderData } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
@@ -9,18 +9,28 @@ const Message = () => {
 
   const {socket} = useAuth()
   const [messageInput, setMessageInput] = useState('')
+  const [messages, setMessages] = useState([])
 
   const selectedUser = useLoaderData()
   
   
   const recipientId = selectedUser.uid;
+
+  useEffect(() => {
+    if(socket) {
+        socket.on("private message", (message) => {
+            setMessages(prevMessages => [...prevMessages, message]);
+        })
+    }
+}, [socket])
+
+
   
   // send message implemented but not checked it works or not 
   const handleSendMessage = () => {
     if(messageInput && socket) {
       socket.emit("private message", {recipientId, message: messageInput})
       console.log(socket)
-      console.log(messageInput)
       setMessageInput('')
     }
     
@@ -32,6 +42,7 @@ const Message = () => {
     }
   }
   
+  messages.map(message => console.log(message))
   
   return (
     <>

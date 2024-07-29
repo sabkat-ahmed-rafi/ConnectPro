@@ -7,9 +7,9 @@ import useAuth from "../../Hooks/useAuth";
 const MessageList = () => {
 
   const [search, setSearch] = useState('')
-  const [userUid, setUserUid] = useState('')
   const { user } = useAuth()
 
+  // showing all the users for the search appereance 
   const {data: allUsers = []} = useQuery({
     queryKey: ["userList", search],
     queryFn: async () => {
@@ -18,7 +18,8 @@ const MessageList = () => {
     }
   })
 
-  const {data: conversations = []} = useQuery({
+  // showing the conversations left side of the message route 
+  const {data: conversations = [], refetch} = useQuery({
     queryKey: ["conversations", user?.email],
     queryFn: async () => {
       const {data} = await axiosSecure.get(`/conversations/${user?.email}`)
@@ -26,18 +27,17 @@ const MessageList = () => {
     }
   })
 
-
-  // have to work on the search bar when a user will select a user from the search appearence i have to hide the appearence section 
-
+  // saving each conversation left side of the message route
   const handleSaveConversation = async (item) => {
     const {data} = await axiosSecure.post(`/conversations`, {...item, myEmail: user.email})
     console.log(data)
+    refetch()
   }
  
-  console.log(userUid)
 
   return (
     <>
+    {/* conversation appearence  */}
       <section className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-sky-400 p-4  border-sky-400">
         <section className="mb-4">
             <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
