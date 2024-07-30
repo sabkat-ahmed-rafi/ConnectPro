@@ -121,25 +121,34 @@ async function run() {
     })
 
     // showing all user for the conversationList view 
-    app.get('/conversations/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { myEmail: email };
+    app.get('/userConversations', async (req, res) => {
+      const senderEmail = req.query.senderEmail;
+      console.log("sender email from userConversation route:", senderEmail);
+      const query = { 
+        $or: [
+          { senderEmail: senderEmail },
+          { receiverEmail: senderEmail }
+        ]
+       };
       const conversations = await conversationList.find(query).toArray();
       res.send(conversations);
     })
 
     // creating a new conversation  for a user  in the conversationList view  
     app.post('/conversations', async (req, res) => {
-      const {uid, email, photo, socketId, userName, myEmail} = req.body;
-      if(email == myEmail) return res.status(200).send({message: "you can't send message to yourself"})
-      const query = { myEmail: myEmail };
+      const {uid, email, photo, userName, senderUid, senderEmail, senderPhoto, senderName } = req.body;
+      if(email == senderEmail) return res.status(200).send({message: "you can't send message to yourself"})
+      const query = { senderEmail: senderEmail };
       const conversation = {
-        uid, 
-        email,
-        photo,
-        socketId,
-        userName,
-        myEmail
+        receiverUid: uid, 
+        receiverEmail: email,
+        receiverPhoto: photo,
+        receiverName: userName,
+        senderUid,
+        senderEmail,
+        senderPhoto,
+        senderName,
+
       }
       const isExist = await conversationList.findOne(query);
       if(isExist) return res.status(404).send({ message: "already exist" })
