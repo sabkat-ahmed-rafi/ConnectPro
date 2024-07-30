@@ -13,7 +13,6 @@ const Authentication = ({children}) => {
     const [loading, setLoading] = useState(true);
     const googleProvider = new GoogleAuthProvider();
     const [socket, setSocket] = useState(null);
-    const [recipientEmail, setRecipientEmail] = useState()
 
 
 
@@ -98,7 +97,7 @@ const Authentication = ({children}) => {
         }
     }, [])
 
-    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, recipientEmail, setRecipientEmail}
+    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket}
 
     return (
         <>
