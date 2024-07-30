@@ -7,7 +7,7 @@ import useAuth from "../../Hooks/useAuth";
 
 const Message = () => {
 
-  const {socket} = useAuth()
+  const {socket, setRecipientEmail, recipientEmail} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [messages, setMessages] = useState([])
 
@@ -17,12 +17,13 @@ const Message = () => {
   const recipientId = selectedUser.uid;
 
   useEffect(() => {
+    setRecipientEmail(selectedUser.email)
     if(socket) {
         socket.on("private message", (message) => {
             setMessages(prevMessages => [...prevMessages, message]);
         })
     }
-}, [socket])
+}, [socket, recipientEmail])
 
 
   

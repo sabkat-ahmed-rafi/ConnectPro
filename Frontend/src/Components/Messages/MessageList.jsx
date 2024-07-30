@@ -7,7 +7,8 @@ import useAuth from "../../Hooks/useAuth";
 const MessageList = () => {
 
   const [search, setSearch] = useState('')
-  const { user } = useAuth()
+  const { user, recipientEmail } = useAuth()
+
 
   // showing all the users for the search appereance 
   const {data: allUsers = []} = useQuery({
@@ -20,20 +21,22 @@ const MessageList = () => {
 
   // showing the conversations left side of the message route 
   const {data: conversations = [], refetch} = useQuery({
-    queryKey: ["conversations", user?.email],
+    queryKey: ["conversations", user?.email, recipientEmail],
     queryFn: async () => {
-      const {data} = await axiosSecure.get(`/conversations/${user?.email}`)
+      const {data} = await axiosSecure.get(`/userConversations?senderEmail=${user?.email}`)
       return data
-    }
+    },
   })
 
   // saving each conversation left side of the message route
   const handleSaveConversation = async (item) => {
-    const {data} = await axiosSecure.post(`/conversations`, {...item, myEmail: user.email})
+    const {data} = await axiosSecure.post(`/conversations`, {...item, senderEmail: user.email, senderUid: user.uid, senderPhoto: user.photoURL, senderName: user.displayName})
     console.log(data)
     refetch()
   }
  
+
+  // now I have to conditionally show the each user for the conversation functionality.
 
   return (
     <>
@@ -43,14 +46,15 @@ const MessageList = () => {
             <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
         </section>
        {
-        conversations.map((conversation) =>  <Link key={conversation._id} to={`/inbox/message/${conversation.uid}`} className="">
+        conversations.map((conversation) =>  <Link key={conversation._id} 
+        to={`/inbox/message/${user?.uid == conversation.receiverUid? conversation.senderUid:conversation.receiverUid }`} className="">
         <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 rounded-lg">
           <img
             alt="Tailwind CSS chat bubble component"
-            src={conversation.photo}
+            src={user?.uid == conversation.receiverUid? conversation.senderPhoto:conversation.receiverPhoto}
             className="w-12 lg:w-12 rounded-full hover:border-black"
           />
-          <h1 className="text-[16px] text-white font-bold lg:flex hidden">{conversation.userName}</h1>
+          <h1 className="text-[16px] text-white font-bold lg:flex hidden">{user?.uid == conversation.receiverUid? conversation.senderName:conversation.receiverName}</h1>
         </div>
       </Link>)
        }
