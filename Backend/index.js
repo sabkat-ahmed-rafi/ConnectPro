@@ -1,3 +1,4 @@
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -50,7 +51,6 @@ const verifyToken = (req, res, next) => {
 }
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_KEY}@connectpro.44qlbv0.mongodb.net/?retryWrites=true&w=majority&appName=ConnectPro`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -68,12 +68,12 @@ async function run() {
     const database = client.db("ConnectPro");
     const usersCollection = database.collection("users"); 
     const conversationList = database.collection("conversations");
+    const messages = database.collection("messages");
     
     // Creating token and saving it to the cookies in browser 
     app.post("/jwt" , async (req, res) => {
 
       const user = req.body;
-
       const token = jwt.sign(user, process.env.TOKEN, { expiresIn: '365d' });
 
       res.cookie("token", token, {
@@ -123,7 +123,6 @@ async function run() {
     // showing all user for the conversationList view 
     app.get('/userConversations', async (req, res) => {
       const senderEmail = req.query.senderEmail;
-      console.log("sender email from userConversation route:", senderEmail);
       const query = { 
         $or: [
           { senderEmail: senderEmail },
@@ -134,11 +133,35 @@ async function run() {
       res.send(conversations);
     })
 
+    // Get users messages 
+    app.get('/messages', async (req, res) => {
+
+      const senderEmail = req.query.senderEmail;
+      const receiverEmail = req.query.receiverEmail;
+      console.log("receiver: ", receiverEmail);
+
+      const query = { 
+        $or: [
+          { senderEmail: senderEmail },
+          { receiverEmail: senderEmail },
+        ],
+       };
+
+
+       const chats = await messages.find(query).toArray();
+       res.send(chats);
+    })
+
     // creating a new conversation  for a user  in the conversationList view  
     app.post('/conversations', async (req, res) => {
       const {uid, email, photo, userName, senderUid, senderEmail, senderPhoto, senderName } = req.body;
       if(email == senderEmail) return res.status(200).send({message: "you can't send message to yourself"})
-      const query = { senderEmail: senderEmail };
+        const query = { 
+          $and: [
+            { senderEmail: senderEmail },
+            { receiverEmail: senderEmail }
+          ]
+         };
       const conversation = {
         receiverUid: uid, 
         receiverEmail: email,
@@ -170,8 +193,7 @@ async function run() {
           { $set: {
             socketId: socket.id,
             email: email,
-           userName: userName,
-           photo: photo
+            userName: userName,
           }},
           { upsert: true }
         )
@@ -181,20 +203,32 @@ async function run() {
 
 
       // sending a private message 
-      socket.on("private message", async ({recipientId, message}) => {
+      socket.on("private message", async ({receiverUid, receiverEmail, receiverPhoto, receiverName, senderUid, senderEmail, senderPhoto, senderName, message}) => {
         const sender = await usersCollection.findOne({socketId: socket.id});
-        const recipient = await usersCollection.findOne({uid: recipientId});
+        const recipient = await usersCollection.findOne({uid: receiverUid});
 
-        if(recipient && recipient.socketId) {
-          io.to(recipient.socketId).emit("private message", { sendersId: sender.uid, message });
+        console.log(`message for ${receiverUid}: ${message}`)
+        const chat = {
+          receiverUid, receiverEmail, receiverPhoto, receiverName, senderUid, senderEmail, senderPhoto, senderName, date: new Date(Date.now()) , message
         }
+
+        
+        if(recipient && recipient.socketId) {
+          io.to(recipient.socketId).emit("private message", { senderId: sender.uid, message });
+        }
+        
+       if(chat) {
+        const singleChat = await messages.insertOne(chat);
+       }
       })
     
+      // Handling public chat messages
       socket.on("chat message", (msg) => {
         console.log(`message from ${socket.id} : ${msg}`)
         io.emit("chat message", msg)
       })
     
+        // Handling client disconnection
       socket.on("disconnect", () => {
         console.log(`socket disconnected: ${socket.id}`)
       })
