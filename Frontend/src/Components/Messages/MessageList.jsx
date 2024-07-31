@@ -21,9 +21,10 @@ const MessageList = () => {
 
   // showing the conversations left side of the message route 
   const {data: conversations = [], refetch} = useQuery({
-    queryKey: ["conversations", user?.email, recipientEmail],
+    queryKey: ["conversations", user?.email],
     queryFn: async () => {
       const {data} = await axiosSecure.get(`/userConversations?senderEmail=${user?.email}`)
+      console.log(data)
       return data
     },
   })
@@ -48,9 +49,9 @@ const MessageList = () => {
        {
         conversations.map((conversation) =>  <Link key={conversation._id} 
         to={`/inbox/message/${user?.uid == conversation.receiverUid? conversation.senderUid:conversation.receiverUid }`} className="">
-        <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 rounded-lg">
+        <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 p-2 rounded-lg">
           <img
-            alt="Tailwind CSS chat bubble component"
+            alt="profile"
             src={user?.uid == conversation.receiverUid? conversation.senderPhoto:conversation.receiverPhoto}
             className="w-12 lg:w-12 rounded-full hover:border-black"
           />
@@ -71,7 +72,7 @@ const MessageList = () => {
  } }  key={item.uid} className="">
             <div className="flex lg:hover:bg-sky-300 hover:text-white transition-all duration-500 items-center lg:space-x-3 lg:px-3 lg:py-2 rounded-lg">
               <img
-                alt="Tailwind CSS chat bubble component"
+                alt="profile"
                 src={item.photo}
                 className="w-12 lg:w-12 rounded-full hover:border-black"
               />
