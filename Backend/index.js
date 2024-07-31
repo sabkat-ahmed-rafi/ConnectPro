@@ -138,12 +138,11 @@ async function run() {
 
       const senderEmail = req.query.senderEmail;
       const receiverEmail = req.query.receiverEmail;
-      console.log("receiver: ", receiverEmail);
 
       const query = { 
         $or: [
-          { senderEmail: senderEmail },
-          { receiverEmail: senderEmail },
+          { senderEmail: senderEmail, receiverEmail: receiverEmail },
+          { senderEmail: receiverEmail, receiverEmail: senderEmail }
         ],
        };
 
