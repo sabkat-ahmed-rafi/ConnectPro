@@ -32,9 +32,9 @@ const Message = () => {
   })
 
   useEffect(() => {
-    if (chats.length > 0) {
+    
       setMessage(chats);
-    }
+    
   }, [chats]);
 
   useEffect(() => {

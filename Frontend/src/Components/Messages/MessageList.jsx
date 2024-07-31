@@ -24,7 +24,6 @@ const MessageList = () => {
     queryKey: ["conversations", user?.email],
     queryFn: async () => {
       const {data} = await axiosSecure.get(`/userConversations?senderEmail=${user?.email}`)
-      console.log(data)
       return data
     },
   })
