@@ -193,6 +193,7 @@ async function run() {
             socketId: socket.id,
             email: email,
             userName: userName,
+            photo,
           }},
           { upsert: true }
         )
