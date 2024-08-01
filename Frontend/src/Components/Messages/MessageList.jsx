@@ -41,20 +41,20 @@ const MessageList = () => {
   return (
     <>
     {/* conversation appearence  */}
-      <section className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-sky-400 p-4  border-sky-400">
+      <section className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-slate-300 p-4 border-r-2 border-sky-500">
         <section className="mb-4">
-            <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-info input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
         </section>
        {
         conversations.map((conversation) =>  <Link key={conversation._id} 
         to={`/inbox/message/${user?.uid == conversation.receiverUid? conversation.senderUid:conversation.receiverUid }`} className="">
-        <div className="flex justify-between lg:hover:bg-sky-500 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 p-2 rounded-lg">
+        <div className="flex justify-between lg:hover:bg-sky-400 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 p-2 rounded-lg">
           <img
             alt="profile"
             src={user?.uid == conversation.receiverUid? conversation.senderPhoto:conversation.receiverPhoto}
             className="w-12 lg:w-12 rounded-full hover:border-black"
           />
-          <h1 className="text-[16px] text-white font-bold lg:flex hidden">{user?.uid == conversation.receiverUid? conversation.senderName:conversation.receiverName}</h1>
+          <h1 className="text-[16px] text-slate-700 hover:text-white font-semibold lg:flex hidden">{user?.uid == conversation.receiverUid? conversation.senderName:conversation.receiverName}</h1>
         </div>
       </Link>)
        }

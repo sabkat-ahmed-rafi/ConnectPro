@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { useLoaderData } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
@@ -17,10 +17,11 @@ const Message = () => {
 
   const receiverUid = selectedUser.uid;
   const receiverEmail = selectedUser.email;
+  const messageEndRef = useRef(null);
   
 
 
-  const {data: chats = [], refetch} = useQuery({
+  const {data: chats = [], refetch, } = useQuery({
   queryKey: ["chats", user?.email, receiverEmail],
   queryFn: async () => {
     const {data} = await axiosSecure.get(`/messages?senderEmail=${user?.email}&receiverEmail=${receiverEmail}`)
@@ -30,22 +31,34 @@ const Message = () => {
   refetchInterval: 300,
   })
 
+  const scrollToBottom = () => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+   }
+
+
   useEffect(() => {
     
       setMessage(chats);
     
   }, [chats]);
 
+
+
+
   useEffect(() => {
     if(socket) {
         socket.on("private message", (newMessage) => {
             setMessage(prevMessages => [...prevMessages, newMessage]);
+            scrollToBottom();
         })
     }
 }, [socket])
 
 
 
+   useEffect(() => {
+     scrollToBottom();
+    }, [message]);
 
 
   
@@ -68,6 +81,7 @@ const Message = () => {
       setMessage(prevMessages => [...prevMessages, newMessage]);
       socket.emit("private message", newMessage)
       setMessageInput('')
+      scrollToBottom();
     }
     
   }
@@ -77,12 +91,50 @@ const Message = () => {
       handleSendMessage();
     }
   }
-  
+
+  if(message.length == 0) {
+    return <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-sky-200">
+       <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
+        <div className="w-8 lg:w-10 rounded-full">
+                  <img 
+                  className="rounded-full"
+                  alt="userImage" 
+                  src={selectedUser.photo} />
+        </div>
+          <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
+        </section>
+      <section className="flex-1 pb-5">
+        <h1 className="flex justify-center items-center h-full lg:text-3xl text-xl font-bold text-slate-400">No messages</h1>
+      </section>
+      <section className="sticky bottom-0 py-2 pl-1 lg:pl-2 pr-4 rounded-md  flex justify-end items-center space-x-4 bg-slate-300 border-2 shadow-md shadow-sky-400 border-sky-400">
+          <input
+            value={messageInput}
+            onKeyPress={handleKeyPress}
+            onChange={(e) => setMessageInput(e.target.value)}
+            type="text"
+            placeholder="Type here"
+            className="input-sm lg:input-md w-full rounded-[35px] focus:border-slate-500 focus:outline-none lg:focus:mr-[200px] transition-all duration-500"
+          />
+          <button onClick={handleSendMessage} className="active:text-white active:size-50 transition-all duration-300">
+            <IoMdSend size={30} />
+          </button>
+        </section>
+    </section>
+  }
   
   return (
     <>
-       <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-sky-200">
-        <section className="flex-1 pb-5">
+       <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
+        <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
+        <div className="w-8 lg:w-10 rounded-full">
+                  <img 
+                  className="rounded-full"
+                  alt="userImage" 
+                  src={selectedUser.photo} />
+        </div>
+          <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
+        </section>
+        <section className="flex-1 pb-5 pt-6">
           {message.map((chat, index) => (
             <div key={index} className={`chat ${chat.senderUid === user?.uid ? 'chat-end' : 'chat-start'}`}>
               <div className="chat-image avatar">
@@ -99,15 +151,16 @@ const Message = () => {
               <div className="chat-bubble bg-sky-400 text-white">{chat.message}</div>
             </div>
           ))}
+          <div ref={messageEndRef} />
         </section>
-        <section className="sticky bottom-0 py-2 pl-1 pr-4 rounded-md bg-sky-400 flex justify-end items-center space-x-4">
+        <section className="sticky bottom-0 py-2 pl-1 lg:pl-2 pr-4 rounded-md  flex justify-end items-center space-x-4 bg-slate-300 border-2 shadow-md shadow-sky-400 border-sky-400">
           <input
             value={messageInput}
             onKeyPress={handleKeyPress}
             onChange={(e) => setMessageInput(e.target.value)}
             type="text"
             placeholder="Type here"
-            className="input w-full rounded-[35px] lg:focus:mr-[200px] transition-all duration-500"
+            className="input-sm lg:input-md w-full rounded-[35px] focus:border-slate-500 focus:outline-none lg:focus:mr-[200px] transition-all duration-500"
           />
           <button onClick={handleSendMessage} className="active:text-white active:size-50 transition-all duration-300">
             <IoMdSend size={30} />
