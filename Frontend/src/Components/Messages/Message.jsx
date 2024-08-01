@@ -17,7 +17,6 @@ const Message = () => {
 
   const receiverUid = selectedUser.uid;
   const receiverEmail = selectedUser.email;
-  console.log(receiverEmail);
   
 
 
@@ -28,7 +27,7 @@ const Message = () => {
     console.log(chats);
     return data
   },
-  refetchInterval: 500,
+  refetchInterval: 300,
   })
 
   useEffect(() => {
@@ -39,8 +38,8 @@ const Message = () => {
 
   useEffect(() => {
     if(socket) {
-        socket.on("private message", (message) => {
-            setMessage(prevMessages => [...prevMessages, message]);
+        socket.on("private message", (newMessage) => {
+            setMessage(prevMessages => [...prevMessages, newMessage]);
         })
     }
 }, [socket])
@@ -54,7 +53,7 @@ const Message = () => {
   const handleSendMessage = () => {
     if(messageInput && socket) {
       // now i have to send all the information about each message in the backend
-      socket.emit("private message", {
+      const newMessage = {
         receiverUid,
         receiverEmail: selectedUser.email,
         receiverPhoto: selectedUser.photo,
@@ -64,9 +63,10 @@ const Message = () => {
         senderPhoto: user?.photoURL,
         senderName: user?.displayName,
         message: messageInput
-      })
-      refetch()
-      console.log(socket)
+      }
+
+      setMessage(prevMessages => [...prevMessages, newMessage]);
+      socket.emit("private message", newMessage)
       setMessageInput('')
     }
     
