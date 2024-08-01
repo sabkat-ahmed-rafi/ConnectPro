@@ -26,17 +26,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-      {
-        path: "/inbox",
-        element: <Inbox />,
-        children: [
-          {
-            path: "/inbox/message/:uid",
-            element: <Message></Message>,
-            loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/userMessage/${params.uid}`)
-          },
-        ],
-      },
+     
     ],
   },
   {
@@ -46,6 +36,17 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/inbox",
+    element: <Inbox />,
+    children: [
+      {
+        path: "/inbox/message/:uid",
+        element: <Message></Message>,
+        loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/userMessage/${params.uid}`)
+      },
+    ],
   },
 ]);
 
