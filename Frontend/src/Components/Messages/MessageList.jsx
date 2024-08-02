@@ -4,10 +4,10 @@ import { axiosSecure } from "../../Hooks/useAxiosSecure";
 import { Link } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 
-const MessageList = () => {
+const MessageList = ({ onMessageClick }) => {
 
   const [search, setSearch] = useState('')
-  const { user, recipientEmail } = useAuth()
+  const { user } = useAuth()
 
 
   // showing all the users for the search appereance 
@@ -46,7 +46,8 @@ const MessageList = () => {
             <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-info input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
         </section>
        {
-        conversations.map((conversation) =>  <Link key={conversation._id} 
+        conversations.map((conversation) =>  <Link key={conversation._id}
+        onClick={onMessageClick} 
         to={`/inbox/message/${user?.uid == conversation.receiverUid? conversation.senderUid:conversation.receiverUid }`} className="">
         <div className="flex justify-between lg:hover:bg-sky-400 hover:text-white transition-all duration-500 items-center lg:space-x-2 lg:px-3 lg:py-2 p-2 rounded-lg">
           <img

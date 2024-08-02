@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { axiosSecure } from "../../Hooks/useAxiosSecure";
+import { IoIosArrowBack } from "react-icons/io";
+
 
 // now i have to implement the previous route system but not previous one the it should be the home route 
 
@@ -95,6 +97,7 @@ const Message = () => {
   if(message.length == 0) {
     return <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-sky-200">
        <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
+       <Link to={`/`}><IoIosArrowBack /></Link>
         <div className="w-8 lg:w-10 rounded-full">
                   <img 
                   className="rounded-full"
@@ -126,11 +129,12 @@ const Message = () => {
     <>
        <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
         <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
+        <Link to={`/`}><IoIosArrowBack /></Link>
         <div className="w-8 lg:w-10 rounded-full">
                   <img 
                   className="rounded-full"
                   alt="userImage" 
-                  src={selectedUser.photo} />
+                  src={selectedUser.photo}/>
         </div>
           <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
         </section>

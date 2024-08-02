@@ -26,7 +26,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
-     
+    //  next route from here 
     ],
   },
   {
