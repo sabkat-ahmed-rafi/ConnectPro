@@ -5,6 +5,10 @@ import useAuth from "../../Hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { axiosSecure } from "../../Hooks/useAxiosSecure";
 import { IoIosArrowBack } from "react-icons/io";
+import { IoMdVideocam } from "react-icons/io";
+import { IoCall } from "react-icons/io5";
+
+
 
 
 // now i have to implement the previous route system but not previous one the it should be the home route 
@@ -137,6 +141,12 @@ const Message = () => {
                   src={selectedUser.photo}/>
         </div>
           <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
+          <div>
+          <IoCall className="rounded hover:text-blue-500" size={23} />
+          </div>
+          <div>
+          <IoMdVideocam className="rounded hover:text-blue-500" size={26} />
+          </div>
         </section>
         <section className="flex-1 pb-5 pt-6">
           {message.map((chat, index) => (
