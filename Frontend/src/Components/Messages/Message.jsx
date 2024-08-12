@@ -68,10 +68,10 @@ const Message = () => {
 
 
   
-  // send message implemented but not checked it works or not 
+  // send message implemented 
   const handleSendMessage = () => {
     if(messageInput && socket) {
-      // now i have to send all the information about each message in the backend
+      
       const newMessage = {
         receiverUid,
         receiverEmail: selectedUser.email,
@@ -109,6 +109,12 @@ const Message = () => {
                   src={selectedUser.photo} />
         </div>
           <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
+          <div>
+          <IoCall className="rounded hover:text-blue-500" size={23} />
+          </div>
+          <div>
+          <IoMdVideocam className="rounded hover:text-blue-500" size={26} />
+          </div>
         </section>
       <section className="flex-1 pb-5">
         <h1 className="flex justify-center items-center h-full lg:text-3xl text-xl font-bold text-slate-400">No messages</h1>
