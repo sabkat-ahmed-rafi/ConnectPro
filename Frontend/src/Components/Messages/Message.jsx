@@ -151,7 +151,7 @@ const Message = () => {
           <IoCall className="rounded hover:text-blue-500" size={23} />
           </div>
           <div>
-          <IoMdVideocam className="rounded hover:text-blue-500" size={26} />
+          <Link to={`/inbox/videoCall/${selectedUser.uid}`}><IoMdVideocam className="rounded hover:text-blue-500" size={26} /></Link>
           </div>
         </section>
         <section className="flex-1 pb-5 pt-6">

@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-query";
 import Inbox from "./Components/Messages/Inbox";
 import Message from "./Components/Messages/Message";
+import VideoCall from "./Components/Messages/VideoCall";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,12 @@ const router = createBrowserRouter([
         element: <Message></Message>,
         loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/userMessage/${params.uid}`)
       },
+      // I have to make a route here for the video and audio functionality to show the video and audio UI
+      {
+        path: "/inbox/videoCall/:uid",
+        element: <VideoCall></VideoCall>,
+        loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/videoCall/${params.uid}`)
+      }
     ],
   },
 ]);
