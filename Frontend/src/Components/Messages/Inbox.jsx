@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MessageList from './MessageList';
 import { Outlet } from 'react-router-dom';
 import useAuth from '../../Hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+
 
 const PlaceHolder = () => {
 
@@ -12,16 +14,42 @@ const PlaceHolder = () => {
             <h1 className='flex items-center justify-center w-full text-2xl font-semibold text-slate-400'>Welcome {user?.displayName}</h1>
         </div>
     );
- };
+ }; 
 
 
-const Inbox = () => {
-    const [showOutlet, setShowOutlet] = useState(false);
+ const Inbox = () => {
+     
+     const navigate = useNavigate();
+     const { socket, setCallerInfo, showOutlet, setShowOutlet } = useAuth();
+     
+
 
     // Function to handle message click and show Outlet
     const handleMessageClick = () => {
         setShowOutlet(true);
     };
+
+
+    // Function to handle incoming call click and show IncomingCall
+    const handleIncomingCall = () => {
+        navigate("/inbox/incomingCall");
+    }
+
+useEffect(() => {
+    if (socket) {
+        socket.on('incomingCall', (data) => {
+        handleIncomingCall();
+        console.log(data)
+        setCallerInfo(data)
+        setShowOutlet(true);
+        });
+
+        return () => {
+            socket.off('incomingCall');
+        };
+    }
+}, [socket]);
+
 
 
     return (
