@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import { MdCallEnd } from "react-icons/md";
-import { FaVideo } from "react-icons/fa";
 import useAuth from '../../Hooks/useAuth';
 
 
@@ -10,16 +9,25 @@ import useAuth from '../../Hooks/useAuth';
 const VideoCall = () => {
 
     const callingUser = useLoaderData()
-    const { user, socket } = useAuth()
+    const { user, socket, previousRoute } = useAuth()
+    const navigate = useNavigate()
     console.log(callingUser)
+    
 
-    // I have to show the receive button to the user whom i call and don't show the button on who calls the person  
+    const goPreviousRoute = () => {
+      setTimeout(() => {
+        if(previousRoute) {
+          navigate(previousRoute)
+        }
+      }, 5000);
+    }
 
     useEffect(() => {
       if(socket) {
         socket.emit("callUser", {receiverSocketId: callingUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL})
+        goPreviousRoute();
       }
-    }, [socket, callingUser, user])
+    }, [socket, callingUser, user, previousRoute])
 
     return (
         <>

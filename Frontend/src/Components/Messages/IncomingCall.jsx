@@ -6,11 +6,13 @@ import { FaVideo } from 'react-icons/fa';
 const IncomingCall = () => {
 
 
+    // Now i have to go back to the previous route after some seconds when the call is end.
+    // I have to use the useNavigate hook for that.
+    // I can also add the sound system when a user call another one it will make sound.
+
+
+
     const { callerInfo } = useAuth();
-
-
-
-
     if (!callerInfo) return <h1>something is wrong!</h1>;
 
     return (

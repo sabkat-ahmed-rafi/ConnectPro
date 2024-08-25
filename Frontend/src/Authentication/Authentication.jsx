@@ -15,6 +15,8 @@ const Authentication = ({children}) => {
     const [socket, setSocket] = useState(null);
     const [callerInfo, setCallerInfo] = useState(null)
     const [showOutlet, setShowOutlet] = useState(false);
+    const [previousRoute, setPreviousRoute] = useState(null);
+    
 
 
 
@@ -99,7 +101,7 @@ const Authentication = ({children}) => {
         }
     }, [])
 
-    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallerInfo, callerInfo, showOutlet, setShowOutlet}
+    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallerInfo, callerInfo, showOutlet, setShowOutlet, previousRoute, setPreviousRoute}
 
     return (
         <>

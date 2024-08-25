@@ -21,6 +21,8 @@ const PlaceHolder = () => {
      
      const navigate = useNavigate();
      const { socket, setCallerInfo, showOutlet, setShowOutlet } = useAuth();
+     const [previousRoute, setPreviousRoute] = useState(null);
+
      
 
 
@@ -32,10 +34,17 @@ const PlaceHolder = () => {
 
     // Function to handle incoming call click and show IncomingCall
     const handleIncomingCall = () => {
+        setPreviousRoute(window.location.pathname);
         navigate("/inbox/incomingCall");
+
+        setTimeout(() => {
+            if (previousRoute) {
+                navigate(previousRoute)
+            }
+        }, 5000);
     }
 
-useEffect(() => {
+    useEffect(() => {
     if (socket) {
         socket.on('incomingCall', (data) => {
         handleIncomingCall();
@@ -48,7 +57,8 @@ useEffect(() => {
             socket.off('incomingCall');
         };
     }
-}, [socket]);
+
+    }, [socket, previousRoute]);
 
 
 

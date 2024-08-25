@@ -15,7 +15,7 @@ import { IoCall } from "react-icons/io5";
 
 const Message = () => {
 
-  const {socket, user} = useAuth()
+  const {socket, user, setPreviousRoute} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
 
@@ -52,6 +52,7 @@ const Message = () => {
 
 
   useEffect(() => {
+    setPreviousRoute(window.location.pathname)
     if(socket) {
         socket.on("private message", (newMessage) => {
             setMessage(prevMessages => [...prevMessages, newMessage]);
