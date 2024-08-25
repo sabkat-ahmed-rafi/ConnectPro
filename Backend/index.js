@@ -232,15 +232,43 @@ async function run() {
        }
       })
 
+
+
       // Handling video call requests
       socket.on("callUser", ({receiverSocketId, callerName, callerPhoto}) => {
         console.log(callerName, callerPhoto)
-      
-        // I can fetch the callerName and callerPhoto data, if I call the incomingCall route in a useEffect in any component.
-        io.to(receiverSocketId).emit("incomingCall", {callerName, callerPhoto})
+        const callData = {
+          receiverSocketId,
+          callerSocketId: socket.id,
+          callerName,
+          callerPhoto,
+          timeStamp: new Date(Date.now()),
+          callType: 'video',
+          callId: Math.random().toString(36).substr(2, 9)
+        }
+        console.log('call', callData.callId)
+        // I can fetch the calldata, if I call the incomingCall route in a useEffect in any component.
+        io.to(receiverSocketId).emit("incomingCall", callData)
       
       })
+
+      // Handling video call accept and rejects
+      socket.on("acceptVideoCall", ({callerSocketId, callId}) => {
+        io.to(callerSocketId).emit("videoCallAccepted", { callId, callStatus: accepted })
+      })
+
+      socket.on("rejectVideoCall", ({callerSocketId, callId}) => {
+        io.to(callerSocketId).emit("videoCallRejected", { callId })
+      })
     
+
+
+
+
+
+
+
+
       // Handling public chat messages
       socket.on("public message", (msg) => {
         console.log(`message from ${socket.id} : ${msg}`)
@@ -248,11 +276,6 @@ async function run() {
       })
 
 
-
-
-
-
-    
         // Handling client disconnection
       socket.on("disconnect", () => {
         console.log(`socket disconnected: ${socket.id}`)
@@ -278,7 +301,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Hello Welcome to ConnectPro server.');
+    res.send('Hello! Welcome to ConnectPro server.');
 })
 
 
