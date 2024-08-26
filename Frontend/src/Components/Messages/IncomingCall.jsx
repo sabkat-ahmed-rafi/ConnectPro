@@ -2,17 +2,28 @@ import React, { useEffect, useState } from 'react';
 import useAuth from '../../Hooks/useAuth';
 import { MdCallEnd } from 'react-icons/md';
 import { FaVideo } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const IncomingCall = () => {
 
+    const { callerInfo, socket } = useAuth();
 
-    // Now i have to go back to the previous route after some seconds when the call is end.
-    // I have to use the useNavigate hook for that.
-    // I can also add the sound system when a user call another one it will make sound.
+    
+
+    const handleAcceptCall = () => {
+        if(socket) {
+            socket.emit('acceptVideoCall', ({callerSocketId: callerInfo.callerSocketId, callId: callerInfo.callId}))
+        }
+    }
+
+    const handleDecline = () => {
+        if(socket) {
+            socket.emit('rejectVideoCall', ({callerSocketId: callerInfo.callerSocketId, callId: callerInfo.callId}))
+            
+        }
+    }
 
 
-
-    const { callerInfo } = useAuth();
     if (!callerInfo) return <h1>something is wrong!</h1>;
 
     return (
@@ -25,8 +36,8 @@ const IncomingCall = () => {
                         <h1 className='text-2xl'>{callerInfo?.callerName}</h1>
                     </div>
                     <div className='flex justify-center lg:space-x-56 space-x-28'>
-                        <p className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></p>
-                        <p className='bg-green-500 p-4 rounded-full'><FaVideo size={27} /></p>
+                        <p onClick={handleDecline} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></p>
+                        <p onClick={handleAcceptCall} className='bg-green-500 p-4 rounded-full'><FaVideo size={27} /></p>
                     </div>
                 </section>
             </section>

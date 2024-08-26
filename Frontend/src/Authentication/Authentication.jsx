@@ -15,11 +15,12 @@ const Authentication = ({children}) => {
     const [socket, setSocket] = useState(null);
     const [callerInfo, setCallerInfo] = useState(null)
     const [showOutlet, setShowOutlet] = useState(false);
-    const [previousRoute, setPreviousRoute] = useState(null);
+    const [callStatus, setCallStatus] = useState("")
+    const [isComingCall, setIsComingCall] = useState(false);
     
 
 
-
+    console.log(callStatus)
 
     // Creating a new user 
     const createUser = (email, password) => {
@@ -84,6 +85,8 @@ const Authentication = ({children}) => {
                 })
 
                 setSocket(socketInstance);
+
+                
                 
             } else {
                 if(socket) {
@@ -101,7 +104,30 @@ const Authentication = ({children}) => {
         }
     }, [])
 
-    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallerInfo, callerInfo, showOutlet, setShowOutlet, previousRoute, setPreviousRoute}
+
+
+    useEffect(() => {
+        if (socket) {
+            // without calling it everywhere i can call in in the authentication file once. 
+            // now i have to send the user whom i am calling to the incoming call UI 
+            socket.on('incomingCall', (data) => {
+            // handleIncomingCall();
+            console.log(data)
+            // based on this 
+            setIsComingCall(true) 
+            setCallerInfo(data)
+            setShowOutlet(true);
+            });
+    
+            return () => {
+                socket.off('incomingCall');
+            };
+        }
+    
+        }, [socket]);
+
+
+    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallerInfo, callerInfo, showOutlet, setShowOutlet, setCallStatus, callStatus}
 
     return (
         <>

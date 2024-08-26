@@ -15,7 +15,7 @@ import { IoCall } from "react-icons/io5";
 
 const Message = () => {
 
-  const {socket, user, setPreviousRoute} = useAuth()
+  const {socket, user} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
 
@@ -34,7 +34,7 @@ const Message = () => {
     console.log(chats);
     return data
   },
-  refetchInterval: 300,
+  refetchInterval: 5000,
   })
 
   const scrollToBottom = () => {
@@ -46,13 +46,12 @@ const Message = () => {
     
       setMessage(chats);
     
-  }, [chats]);
+  }, [chats, selectedUser]);
 
 
 
 
   useEffect(() => {
-    setPreviousRoute(window.location.pathname)
     if(socket) {
         socket.on("private message", (newMessage) => {
             setMessage(prevMessages => [...prevMessages, newMessage]);

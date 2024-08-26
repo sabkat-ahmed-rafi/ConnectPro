@@ -9,25 +9,49 @@ import useAuth from '../../Hooks/useAuth';
 const VideoCall = () => {
 
     const callingUser = useLoaderData()
-    const { user, socket, previousRoute } = useAuth()
+    const { user, socket, previousRoute, setCallStatus, callStatus } = useAuth()
     const navigate = useNavigate()
-    console.log(callingUser)
+    // console.log(callingUser)
     
 
     const goPreviousRoute = () => {
-      setTimeout(() => {
-        if(previousRoute) {
-          navigate(previousRoute)
-        }
-      }, 5000);
+      if(callStatus === "") {
+        setTimeout(() => {
+          if(previousRoute) {
+            navigate(previousRoute)
+          }
+        }, 10000);
+      }
+      
     }
 
     useEffect(() => {
       if(socket) {
         socket.emit("callUser", {receiverSocketId: callingUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL})
-        goPreviousRoute();
+        socket.on("videoCallAccepted", (receivedCallData) => {
+          if (receivedCallData) {
+            console.log(receivedCallData)
+            if (receivedCallData.callStatus === "accepted") {
+              setCallStatus("accepted")
+              
+            }
+            // Here you can start the video call logic, and also update the call status in the database.
+          }
+        })
+        socket.on("videoCallRejected", (declinedCallData) => {
+          if (declinedCallData) {
+            console.log(declinedCallData)
+            if (declinedCallData.callStatus === "declined") {
+              setCallStatus("declined")
+              
+            }
+            // Here you can show a notification or handle the declined call.
+          }
+        })
       }
-    }, [socket, callingUser, user, previousRoute])
+    }, [socket, callingUser, user])
+
+
 
     return (
         <>

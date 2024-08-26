@@ -246,7 +246,6 @@ async function run() {
           callType: 'video',
           callId: Math.random().toString(36).substr(2, 9)
         }
-        console.log('call', callData.callId)
         // I can fetch the calldata, if I call the incomingCall route in a useEffect in any component.
         io.to(receiverSocketId).emit("incomingCall", callData)
       
@@ -254,11 +253,12 @@ async function run() {
 
       // Handling video call accept and rejects
       socket.on("acceptVideoCall", ({callerSocketId, callId}) => {
-        io.to(callerSocketId).emit("videoCallAccepted", { callId, callStatus: accepted })
+        console.log( 'call receive:  ', callerSocketId)
+        io.to(callerSocketId).emit("videoCallAccepted", { callId, callStatus: "accepted" })
       })
 
       socket.on("rejectVideoCall", ({callerSocketId, callId}) => {
-        io.to(callerSocketId).emit("videoCallRejected", { callId })
+        io.to(callerSocketId).emit("videoCallRejected", { callId, callStatus: "declined" })
       })
     
 

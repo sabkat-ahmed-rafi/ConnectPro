@@ -10,27 +10,17 @@ const Home = () => {
       // Function to handle incoming call click and show IncomingCall
       
       const handleIncomingCall = () => {
-        navigate("/inbox/incomingCall");
+        // navigate("/inbox/incomingCall");
 
-        setTimeout(() => {
-                navigate("/")
-        }, 5000);
+        // if(callStatus === "") {
+        //     setTimeout(() => {
+        //         navigate("/")
+        // }, 10000);
+        // }
+
     }
 
-    useEffect(() => {
-        if (socket) {
-            socket.on('incomingCall', (data) => {
-            handleIncomingCall();
-            console.log(data)
-            setCallerInfo(data)
-            setShowOutlet(true);
-            });
-    
-            return () => {
-                socket.off('incomingCall');
-            };
-        }
-    }, [socket]);
+
 
 
     return (
