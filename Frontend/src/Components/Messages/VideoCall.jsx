@@ -9,21 +9,22 @@ import useAuth from '../../Hooks/useAuth';
 const VideoCall = () => {
 
     const callingUser = useLoaderData()
-    const { user, socket, previousRoute, setCallStatus, callStatus } = useAuth()
+    const { user, socket, setCallStatus, callStatus, isComingCall } = useAuth()
     const navigate = useNavigate()
+    const [previouseRoute, setPreviousRoute] = useState()
     // console.log(callingUser)
     
 
-    const goPreviousRoute = () => {
-      if(callStatus === "") {
-        setTimeout(() => {
-          if(previousRoute) {
-            navigate(previousRoute)
-          }
-        }, 10000);
-      }
+    // const goPreviousRoute = () => {
+    //   if(callStatus === "") {
+    //     // setTimeout(() => {
+    //     //     // if(previouseRoute) {
+    //     //       // navigate(-2)
+    //     //     // }
+    //     // }, 7000);
+    //   }
       
-    }
+    // }
 
     useEffect(() => {
       if(socket) {
@@ -48,8 +49,12 @@ const VideoCall = () => {
             // Here you can show a notification or handle the declined call.
           }
         })
+        // goPreviousRoute()
+        if(isComingCall != true) {
+          navigate(-1)
+        }
       }
-    }, [socket, callingUser, user])
+    }, [socket, callingUser, user, isComingCall])
 
 
 

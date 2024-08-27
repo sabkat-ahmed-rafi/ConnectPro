@@ -48,15 +48,6 @@ const router = createBrowserRouter([
         element: <Message></Message>,
         loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/userMessage/${params.uid}`)
       },
-      {
-        path: "/inbox/videoCall/:uid",
-        element: <VideoCall></VideoCall>,
-        loader: ({params}) => fetch(`${import.meta.env.VITE_BACKEND_URL}/videoCall/${params.uid}`)
-      },
-      {
-        path: "/inbox/incomingCall",
-        element: <IncomingCall></IncomingCall>,
-      }
     ],
   },
 ]);

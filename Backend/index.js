@@ -121,15 +121,6 @@ async function run() {
       res.send(user);
     })
 
-    // creating the video call UI and functionality
-    app.get('/videoCall/:uid', async (req, res) => {
-      const userId = req.params.uid;
-      const query = { uid: userId }
-      const user = await usersCollection.findOne(query);
-      if(!user) return res.status(404).send({ message: "User not found" })
-      res.send(user);
-    })
-
     // showing all user for the conversationList view 
     app.get('/userConversations', async (req, res) => {
       const senderEmail = req.query.senderEmail;
@@ -235,9 +226,10 @@ async function run() {
 
 
       // Handling video call requests
-      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto}) => {
-        console.log(callerName, callerPhoto)
+      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid}) => {
+        console.log(callerName, receiverUid)
         const callData = {
+          receiverUid,
           receiverSocketId,
           callerSocketId: socket.id,
           callerName,

@@ -3,20 +3,21 @@ import React, { createContext, useEffect, useState } from 'react';
 import auth from './Firebase/firebase.init';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client'
+import { Navigate } from 'react-router-dom';
 
 
 export const AuthContext = createContext()
 
-const Authentication = ({children}) => {
+const Authentication = ({children, navigate}) => {
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const googleProvider = new GoogleAuthProvider();
     const [socket, setSocket] = useState(null);
-    const [callerInfo, setCallerInfo] = useState(null)
+    const [callInfo, setCallInfo] = useState(null)
     const [showOutlet, setShowOutlet] = useState(false);
     const [callStatus, setCallStatus] = useState("")
-    const [isComingCall, setIsComingCall] = useState(false);
+    const [isComingCall, setIsComingCall] = useState();
     
 
 
@@ -92,6 +93,7 @@ const Authentication = ({children}) => {
                 if(socket) {
                     socket.disconnect();
                     setSocket(null)
+                    
                 }
                 setLoading(false)
             }
@@ -108,26 +110,29 @@ const Authentication = ({children}) => {
 
     useEffect(() => {
         if (socket) {
-            // without calling it everywhere i can call in in the authentication file once. 
-            // now i have to send the user whom i am calling to the incoming call UI 
+            // Without calling it everywhere I can call in the authentication file once. 
+            // Now I have to send the user whom I am calling to the incoming call UI.
             socket.on('incomingCall', (data) => {
-            // handleIncomingCall();
-            console.log(data)
-            // based on this 
-            setIsComingCall(true) 
-            setCallerInfo(data)
-            setShowOutlet(true);
+                // based on this 
+                console.log(data)
+            if(data) {
+                setIsComingCall(true) 
+                setCallInfo(data)
+            }
             });
+
     
-            return () => {
-                socket.off('incomingCall');
-            };
-        }
+        return () => {
+            socket.off('incomingCall');
+        };
+
+    }
     
         }, [socket]);
 
 
-    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallerInfo, callerInfo, showOutlet, setShowOutlet, setCallStatus, callStatus}
+
+    const contextInfo = {createUser, login, updateUser, googleLogin, logout, user, loading, setLoading, socket, setCallInfo, callInfo, showOutlet, setShowOutlet, setCallStatus, callStatus, isComingCall, setIsComingCall}
 
     return (
         <>

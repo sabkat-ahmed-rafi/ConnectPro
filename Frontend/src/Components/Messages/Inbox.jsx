@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import MessageList from './MessageList';
 import { Outlet } from 'react-router-dom';
 import useAuth from '../../Hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 
 const PlaceHolder = () => {
@@ -19,9 +18,7 @@ const PlaceHolder = () => {
 
  const Inbox = () => {
      
-     const navigate = useNavigate();
-     const { socket, setCallerInfo, showOutlet, setShowOutlet, callStatus } = useAuth();
-     const [previousRoute, setPreviousRoute] = useState(null);
+     const {showOutlet, setShowOutlet } = useAuth();
 
      
 
@@ -30,22 +27,6 @@ const PlaceHolder = () => {
     const handleMessageClick = () => {
         setShowOutlet(true);
     };
-
-
-    // Function to handle incoming call click and show IncomingCall
-    // const handleIncomingCall = () => {
-    //     navigate("/inbox/incomingCall");
-
-    //     if(callStatus === "") {
-    //         setTimeout(() => {
-    //             if (previousRoute) {
-    //                 console.log("hello");
-    //                 navigate(-1)
-    //             }
-    //         }, 10000);
-    //     }
-    // }
-
 
 
 

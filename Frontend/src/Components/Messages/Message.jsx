@@ -15,7 +15,7 @@ import { IoCall } from "react-icons/io5";
 
 const Message = () => {
 
-  const {socket, user} = useAuth()
+  const {socket, user, callInfo} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
 
@@ -25,9 +25,10 @@ const Message = () => {
   const receiverEmail = selectedUser.email;
   const messageEndRef = useRef(null);
   
+ console.log(callInfo)
 
 
-  const {data: chats = [], refetch, } = useQuery({
+  const {data: chats = []} = useQuery({
   queryKey: ["chats", user?.email, receiverEmail],
   queryFn: async () => {
     const {data} = await axiosSecure.get(`/messages?senderEmail=${user?.email}&receiverEmail=${receiverEmail}`)
@@ -53,12 +54,13 @@ const Message = () => {
 
   useEffect(() => {
     if(socket) {
+        // Getting private messages from "pivate message" socket event 
         socket.on("private message", (newMessage) => {
             setMessage(prevMessages => [...prevMessages, newMessage]);
             scrollToBottom();
         })
     }
-}, [socket])
+}, [socket, selectedUser])
 
 
 
@@ -97,6 +99,20 @@ const Message = () => {
       handleSendMessage();
     }
   }
+
+
+
+  // Now I will implement the video calling function and UI through modal.
+  const handleVideoCall = () => {
+    if(socket) {
+      // sending info for video call 
+      socket.emit("callUser", {receiverSocketId: selectedUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL, receiverUid: selectedUser.uid})
+    }
+  }
+
+  
+
+
 
   if(message.length == 0) {
     return <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-sky-200">
@@ -151,7 +167,7 @@ const Message = () => {
           <IoCall className="rounded hover:text-blue-500" size={23} />
           </div>
           <div>
-          <Link to={`/inbox/videoCall/${selectedUser.uid}`}><IoMdVideocam className="rounded hover:text-blue-500" size={26} /></Link>
+          <Link onClick={handleVideoCall}><IoMdVideocam className="rounded hover:text-blue-500" size={26} /></Link>
           </div>
         </section>
         <section className="flex-1 pb-5 pt-6">
@@ -192,3 +208,39 @@ const Message = () => {
 };
 
 export default Message;
+
+
+
+
+
+// Giving call UI 
+
+{/* <section className='flex lg:h-[502px] h-[400px] w-full flex-col p-4 bg-[#232124] text-white'>
+            <section className='flex flex-col lg:space-y-60 space-y-40'>
+               <div className='flex flex-col justify-center items-center'>
+                <div><img className='w-18 rounded-full' src={callingUser.photo} alt="Profile Picture" />      </div>     
+                  <h1 className='text-2xl'>{callingUser.userName}</h1>
+                </div>
+                <div className='flex justify-center lg:space-x-56 space-x-28'>
+                    <p className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></p>
+                </div>
+            </section>
+</section> */}
+
+
+
+
+// Incoming call UI 
+
+{/* <section className='flex lg:h-[502px] h-[400px] w-full flex-col p-4 bg-[#232124] text-white'>
+<section className='flex flex-col lg:space-y-60 space-y-40'>
+    <div className='flex flex-col justify-center items-center'>
+        <div><img className='w-18 rounded-full' src={callerInfo?.callerPhoto} alt="Profile Picture" /></div>     
+        <h1 className='text-2xl'>{callerInfo?.callerName}</h1>
+    </div>
+    <div className='flex justify-center lg:space-x-56 space-x-28'>
+        <p onClick={handleDecline} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></p>
+        <p onClick={handleAcceptCall} className='bg-green-500 p-4 rounded-full'><FaVideo size={27} /></p>
+    </div>
+</section>
+</section> */}

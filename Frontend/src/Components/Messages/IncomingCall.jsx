@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import useAuth from '../../Hooks/useAuth';
 import { MdCallEnd } from 'react-icons/md';
 import { FaVideo } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
 
 const IncomingCall = () => {
 
