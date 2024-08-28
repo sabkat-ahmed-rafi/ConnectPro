@@ -14,10 +14,10 @@ import {
 } from "@tanstack/react-query";
 import Inbox from "./Components/Messages/Inbox";
 import Message from "./Components/Messages/Message";
-import VideoCall from "./Components/Messages/VideoCall";
-import IncomingCall from "./Components/Messages/IncomingCall";
+import IncomingCall from "./Components/UI/IncomingCall";
 
 const queryClient = new QueryClient();
+
 
 const router = createBrowserRouter([
   {
@@ -58,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Authentication>
         <Toaster position="bottom-right" />
         <RouterProvider router={router} />
+        <IncomingCall/>
       </Authentication>
     </QueryClientProvider>
   </React.StrictMode>

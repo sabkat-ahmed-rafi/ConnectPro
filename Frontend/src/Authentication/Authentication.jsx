@@ -17,7 +17,7 @@ const Authentication = ({children, navigate}) => {
     const [callInfo, setCallInfo] = useState(null)
     const [showOutlet, setShowOutlet] = useState(false);
     const [callStatus, setCallStatus] = useState("")
-    const [isComingCall, setIsComingCall] = useState();
+    const [isComingCall, setIsComingCall] = useState(false);
     
 
 
@@ -110,16 +110,20 @@ const Authentication = ({children, navigate}) => {
 
     useEffect(() => {
         if (socket) {
-            // Without calling it everywhere I can call in the authentication file once. 
-            // Now I have to send the user whom I am calling to the incoming call UI.
+           
             socket.on('incomingCall', (data) => {
-                // based on this 
-                console.log(data)
-            if(data) {
-                setIsComingCall(true) 
-                setCallInfo(data)
+                if(data) {
+                    setIsComingCall(true) 
+                    setCallInfo(data)
+                    console.log(data)
             }
             });
+            
+            // if(isComingCall) {
+            //     setTimeout(() => {
+            //         setIsComingCall(false)
+            //     }, 5000);
+            // }
 
     
         return () => {
@@ -128,7 +132,7 @@ const Authentication = ({children, navigate}) => {
 
     }
     
-        }, [socket]);
+        }, [socket, isComingCall]);
 
 
 

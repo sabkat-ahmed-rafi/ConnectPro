@@ -7,7 +7,6 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
 const http = require('http');
 const { Server } = require('socket.io');
-const { CallTracker } = require('assert');
 
 
 
@@ -226,7 +225,7 @@ async function run() {
 
 
       // Handling video call requests
-      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid}) => {
+      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid, receiverPhoto, receiverName}) => {
         console.log(callerName, receiverUid)
         const callData = {
           receiverUid,
@@ -234,6 +233,8 @@ async function run() {
           callerSocketId: socket.id,
           callerName,
           callerPhoto,
+          receiverName,
+          receiverPhoto,
           timeStamp: new Date(Date.now()),
           callType: 'video',
           callId: Math.random().toString(36).substr(2, 9)
@@ -251,6 +252,10 @@ async function run() {
 
       socket.on("rejectVideoCall", ({callerSocketId, callId}) => {
         io.to(callerSocketId).emit("videoCallRejected", { callId, callStatus: "declined" })
+      })
+
+      socket.on("callerRejected", ({callerSocketId}) => {
+        io.to(callerSocketId).emit("callerVideoCallAccepted", {callStatus: "rejected" })
       })
     
 

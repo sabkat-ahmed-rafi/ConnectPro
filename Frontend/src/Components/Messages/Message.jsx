@@ -7,6 +7,7 @@ import { axiosSecure } from "../../Hooks/useAxiosSecure";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoMdVideocam } from "react-icons/io";
 import { IoCall } from "react-icons/io5";
+import OngoingCall from "../UI/OngoingCall";
 
 
 
@@ -15,7 +16,7 @@ import { IoCall } from "react-icons/io5";
 
 const Message = () => {
 
-  const {socket, user, callInfo} = useAuth()
+  const {socket, user, callInfo, isComingCall} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
 
@@ -25,7 +26,7 @@ const Message = () => {
   const receiverEmail = selectedUser.email;
   const messageEndRef = useRef(null);
   
- console.log(callInfo)
+
 
 
   const {data: chats = []} = useQuery({
@@ -101,12 +102,26 @@ const Message = () => {
   }
 
 
+  // useEffect(() => {
+  //   console.log(isComingCall)
+  //     if(isComingCall == undefined) {
+  //       const modal = document.getElementById('my_modal_5');
+  //       console.log(modal)
+  //       modal.close();
+  //     }
+  //   }, [isComingCall]);
+
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
+    console.log("hitting man")
+     
+    const modal = document.getElementById('my_onGoing_modal');
+    if (modal) modal.showModal();
+
     if(socket) {
       // sending info for video call 
-      socket.emit("callUser", {receiverSocketId: selectedUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL, receiverUid: selectedUser.uid})
+      socket.emit("callUser", {receiverSocketId: selectedUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL, receiverUid: selectedUser.uid, receiverPhoto: selectedUser.photo, receiverName: selectedUser.displayName})
     }
   }
 
@@ -166,8 +181,8 @@ const Message = () => {
           <div>
           <IoCall className="rounded hover:text-blue-500" size={23} />
           </div>
-          <div>
-          <Link onClick={handleVideoCall}><IoMdVideocam className="rounded hover:text-blue-500" size={26} /></Link>
+          <div onClick={handleVideoCall}>
+          <IoMdVideocam className="rounded hover:text-blue-500" size={26} />
           </div>
         </section>
         <section className="flex-1 pb-5 pt-6">
@@ -203,6 +218,7 @@ const Message = () => {
           </button>
         </section>
       </section>
+      <OngoingCall selectedUser={selectedUser} />
     </>
   );
 };
