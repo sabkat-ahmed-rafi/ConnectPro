@@ -255,6 +255,20 @@ async function run() {
     
 
 
+      // NEW: Handling WebRTC Offer
+      socket.on("sendOffer", ({receiverSocketId, offer}) => {
+        io.to(receiverSocketId).emit("receiveOffer", { offer, from: socket.id });
+      });
+      
+      // NEW: Handling WebRTC Answer
+      socket.on("sendAnswer", ({callerSocketId, answer}) => {
+        io.to(callerSocketId).emit("receiveAnswer", { answer, from: socket.id });
+      });
+      
+      // NEW: Handling ICE Candidate Exchange
+      socket.on("sendIceCandidate", ({receiverSocketId, candidate}) => {
+        io.to(receiverSocketId).emit("receiveIceCandidate", { candidate, from: socket.id });
+      });
 
 
 
