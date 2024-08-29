@@ -16,15 +16,22 @@ import OngoingCall from "../UI/OngoingCall";
 
 const Message = () => {
 
+  const peerConnection = new RTCPeerConnection();
+
   const {socket, user, callInfo, isComingCall} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
+  
 
   const selectedUser = useLoaderData()
 
   const receiverUid = selectedUser.uid;
   const receiverEmail = selectedUser.email;
   const messageEndRef = useRef(null);
+
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const peerConnectionRef = useRef(null);
   
 
 
@@ -102,20 +109,38 @@ const Message = () => {
   }
 
 
-  // useEffect(() => {
-  //   console.log(isComingCall)
-  //     if(isComingCall == undefined) {
-  //       const modal = document.getElementById('my_modal_5');
-  //       console.log(modal)
-  //       modal.close();
-  //     }
-  //   }, [isComingCall]);
+  const askedVideoPermission = () => {
+    peerConnectionRef.current = peerConnection;
+        // Capture video and audio
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+          // Display the local video (self-view) on the webpage
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
+          }
+          // Add the stream to the peer connection
+          stream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, stream);
+          });
+          return peerConnection.createOffer();
+        })
+        .then(offer => {
+          return peerConnection.setLocalDescription(offer);
+        })
+        .then(() => {
+          socket.emit('sendOffer', { offer: peerConnection.localDescription, receiverSocketId });
+        })
+        .catch(error => {
+          console.error('Error accessing media devices.', error);
+        });
+  }
 
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
     console.log("hitting man")
      
+    askedVideoPermission()
     const modal = document.getElementById('my_onGoing_modal');
     if (modal) modal.showModal();
 
@@ -218,7 +243,7 @@ const Message = () => {
           </button>
         </section>
       </section>
-      <OngoingCall selectedUser={selectedUser} />
+      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnection} />
     </>
   );
 };

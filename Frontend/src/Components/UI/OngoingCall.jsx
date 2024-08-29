@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MdCallEnd } from 'react-icons/md';
 import useAuth from '../../Hooks/useAuth';
 
-const OngoingCall = ({selectedUser}) => {
+const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectionRef, peerConnection}) => {
 
   const { socket, isComingCall, callInfo, setIsComingCall, setCallStatus, callStatus } = useAuth()
 
 
+
   useEffect(() => {
     console.log(callInfo)
+
 
     if(socket) {
 
@@ -36,13 +38,13 @@ const OngoingCall = ({selectedUser}) => {
 
 
 
-    if(callStatus == "declined" || callStatus == "accepted") {
+    if(callStatus == "declined") {
       const modal = document.getElementById('my_onGoing_modal');
       if (modal) modal.close();
       setCallStatus('')
     }
 
-  }, [callStatus]);
+  }, [socket, callStatus]);
 
 
  
@@ -63,7 +65,8 @@ const OngoingCall = ({selectedUser}) => {
 
     return (
         <>
-            <dialog id="my_onGoing_modal" className='flex lg:h-[502px] h-[400px] w-full flex-col p-4 bg-[#232124] text-white modal modal-bottom sm:modal-middle'>
+            <dialog id="my_onGoing_modal" className='w-full flex-col p-4 bg-[#232124] text-white modal modal-bottom sm:modal-middle'>
+            {/* flex lg:h-[502px] h-[400px] */}
             <section className='flex flex-col lg:space-y-60 space-y-40 modal-box'>
                <div className='flex flex-col justify-center items-center'>
                 <div><img className='w-18 rounded-full' src={selectedUser?.photo} alt="Profile Picture" />      </div>     
@@ -75,9 +78,46 @@ const OngoingCall = ({selectedUser}) => {
                 </form>
                 </div>
             </section>
+            <section className="flex">
+               <video ref={localVideoRef} autoPlay playsInline className='w-[300px]'></video>
+               <video ref={remoteVideoRef} autoPlay playsInline className='w-[300px]'></video>
+            </section>
             </dialog>
         </>
     );
 };
 
 export default OngoingCall;
+
+
+
+// WebRTC connection 
+
+
+// const peerConnection = new RTCPeerConnection();
+
+// // When ICE candidates are found, send them to the other peer
+// peerConnection.onicecandidate = (event) => {
+//   if (event.candidate) {
+//     socket.emit('sendIceCandidate', { candidate: event.candidate, receiverSocketId });
+//   }
+// };
+
+// // Create an offer and send it to the callee
+// peerConnection.createOffer()
+//   .then(offer => {
+//     return peerConnection.setLocalDescription(offer);
+//   })
+//   .then(() => {
+//     socket.emit('sendOffer', { offer: peerConnection.localDescription, receiverSocketId });
+//   });
+
+// // Handle answer from the callee
+// socket.on('receiveAnswer', ({ answer }) => {
+//   peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+// });
+
+// // Receiving ICE candidates from the callee
+// socket.on('receiveIceCandidate', ({ candidate }) => {
+//   peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+// });
