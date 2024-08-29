@@ -99,8 +99,7 @@ const IncomingCall = () => {
 
   return (
     <>
-      <dialog id="my_incoming_modal" className="w-full flex-col p-4 bg-[#232124] text-white modal modal-bottom sm:modal-middle">
-      {/* flex lg:h-[502px] h-[400px] */}
+      <dialog id="my_incoming_modal" className="flex lg:h-[502px] h-[400px] w-full flex-col p-4 bg-[#232124] text-white modal modal-bottom sm:modal-middle">
         <section className="flex flex-col lg:space-y-60 space-y-40 modal-box">
           <div className="flex flex-col justify-center items-center">
             <div>
@@ -128,7 +127,7 @@ const IncomingCall = () => {
             </button>
           </div>
         </section>
-        <section className="flex">
+        <section className="hidden">
                <video ref={localVideoRef} autoPlay playsInline className='w-[300px]'></video>
                <video ref={remoteVideoRef} autoPlay playsInline className='w-[300px]'></video>
             </section>
