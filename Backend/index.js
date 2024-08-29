@@ -255,7 +255,7 @@ async function run() {
       })
 
       socket.on("callerRejected", ({callerSocketId}) => {
-        io.to(callerSocketId).emit("callerVideoCallAccepted", {callStatus: "rejected" })
+        io.to(callerSocketId).emit("callerVideoCallRejected", {callStatus: "rejected" })
       })
     
 
