@@ -3,7 +3,6 @@ import React, { createContext, useEffect, useState } from 'react';
 import auth from './Firebase/firebase.init';
 import axios from 'axios';
 import socketIOClient from 'socket.io-client'
-import { Navigate } from 'react-router-dom';
 
 
 export const AuthContext = createContext()

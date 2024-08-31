@@ -10,6 +10,8 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 
   useEffect(() => {
 
+    
+
     // Handle incoming answer from callee
     socket.on("receiveAnswer", ({ answer }) => {
       console.log("got the answer from callee");
@@ -76,6 +78,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
     }
 
     setCallStatus('')
+
 
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {

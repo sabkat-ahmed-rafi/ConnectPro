@@ -14,13 +14,14 @@ import OngoingCall from "../UI/OngoingCall";
 
 // now i have to implement the previous route system but not previous one the it should be the home route 
 
-const Message = () => {
+const Message = ({setShowOutlet}) => {
 
   
 
   const {socket, user, callInfo, isComingCall} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
+  const [isInCall, setInCall] = useState(false)
   
 
   const selectedUser = useLoaderData()
@@ -147,6 +148,8 @@ const Message = () => {
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
+
+    if(callInfo != null) return alert(`User is in another call`);
          
     askedVideoPermission()
     const modal = document.getElementById('my_onGoing_modal');
@@ -203,7 +206,7 @@ const Message = () => {
     <>
        <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
         <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
-        <Link to={`/`}><IoIosArrowBack /></Link>
+        <Link to={`/`} onClick={() => setShowOutlet(false)}><IoIosArrowBack /></Link>
         <div className="w-8 lg:w-10 rounded-full">
                   <img 
                   className="rounded-full"
@@ -251,7 +254,7 @@ const Message = () => {
           </button>
         </section>
       </section>
-      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current} />
+      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current}  />
     </>
   );
 };
