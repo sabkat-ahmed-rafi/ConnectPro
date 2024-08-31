@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdCallEnd } from 'react-icons/md';
 import useAuth from '../../Hooks/useAuth';
 
-const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectionRef, peerConnection}) => {
+const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnection}) => {
 
-  const { socket, isComingCall, callInfo, setIsComingCall, setCallStatus, callStatus } = useAuth()
+  const { socket, callInfo, setCallStatus, callStatus } = useAuth()
 
 
 
@@ -19,11 +19,13 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
     });
 
     // Handle Ice candidate generation 
-    peerConnection.oniceCandidate = (event) => {
-      if(event.candidate) {
-        socket.emit("sendIceCandidate", {candidate: event.candidate, receiverSocketId: selectedUser.socketId});
-      }
-    };
+    if(peerConnection !== null) {
+      peerConnection.oniceCandidate = (event) => {
+        if(event.candidate) {
+          socket.emit("sendIceCandidate", {candidate: event.candidate, receiverSocketId: selectedUser.socketId});
+        }
+      };
+    }
 
     // Handle incoming ICE candidates from the callee
     socket.on("receiveIceCandidate", ({ candidate }) => {
@@ -31,11 +33,13 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
         peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
       }
     });
-
+    
     // Handle the remote video stream from the callee
-    peerConnection.ontrack = (event) => {
-      if(remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0]
+    if(peerConnection !== null) {
+      peerConnection.ontrack = (event) => {
+        if(remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = event.streams[0]
+        }
       }
     }
 
@@ -71,6 +75,8 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
       stream.getTracks().forEach(track => track.stop())
     }
 
+    setCallStatus('')
+
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {
       peerConnection.close();
@@ -78,10 +84,16 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 
       const modal = document.getElementById('my_onGoing_modal');
       if (modal) modal.close();
-      setCallStatus('')
     }
 
 
+
+    return () => {
+      socket.off("receiveAnswer");
+      socket.off("receiveIceCandidate");
+      socket.off("videoCallAccepted");
+      socket.off("videoCallRejected");
+    };
 
 
   }, [socket, callStatus]);
@@ -106,6 +118,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
       peerConnection.close();
     }
 
+    setCallStatus('')
     
     const modal = document.getElementById('my_onGoing_modal');
     if (modal) modal.close();
@@ -115,7 +128,6 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
       socket.emit('callerRejected', ({callerSocketId: selectedUser.socketId}))
     }
 
-    setCallStatus('')
 
   }
 

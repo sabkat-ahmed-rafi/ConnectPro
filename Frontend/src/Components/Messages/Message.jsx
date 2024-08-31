@@ -31,7 +31,7 @@ const Message = () => {
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerConnectionRef = useRef(new RTCPeerConnection());
+  const peerConnectionRef = useRef(null);
   
 
 
@@ -108,9 +108,15 @@ const Message = () => {
     }
   }
 
+  const createPeerConnection = () => {
+    const pc = new RTCPeerConnection();
+    peerConnectionRef.current = pc;
+    return pc;
+  }
+
 
   const askedVideoPermission = () => {
-    const peerConnection = peerConnectionRef.current;
+    const peerConnection = createPeerConnection();
         // Capture video and audio
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {

@@ -8,22 +8,26 @@ import { FaVideo } from 'react-icons/fa';
 
 const IncomingCall = () => {
 
-  const { socket, isComingCall, callInfo, setIsComingCall, setCallStatus, callStatus } = useAuth()
+  const { socket, isComingCall, callInfo, setIsComingCall } = useAuth()
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerConnectionRef = useRef(new RTCPeerConnection());
-  const peerConnection = peerConnectionRef.current;
-
+  const peerConnectionRef = useRef(null);
+  
   const modal = document.getElementById('my_incoming_modal');
   
-
+  const createPeerConnection = () => {
+    const pc = new RTCPeerConnection();
+    peerConnectionRef.current = pc;
+    return pc;
+  }
+  
   useEffect(() => {
     console.log(isComingCall)
-
-
+    
+    const peerConnection = createPeerConnection();
 
     if(isComingCall) {
-          // Capture video and audio
+    // Capture video and audio
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
       // Display the local video (self-view) on the webpage
@@ -68,16 +72,15 @@ const IncomingCall = () => {
       }
     };
 
-
     }
 
 
 
 
     socket?.on("callerVideoCallRejected", (rejectedCallData) => {
-      if (rejectedCallData) {
+  if (rejectedCallData) {
         console.log(rejectedCallData)
-        if (rejectedCallData.callStatus == "rejected") {
+    if (rejectedCallData.callStatus == "rejected") {
     // Turning off video and audio
     if(localVideoRef && localVideoRef.current.srcObject) {
       const stream = localVideoRef.current.srcObject;
@@ -87,11 +90,11 @@ const IncomingCall = () => {
     if(peerConnection.signalingState !== "closed") {
       peerConnection.close();
     }          
-          if (modal) modal.close();
-          setIsComingCall(false)
+    setIsComingCall(false)
+    if (modal) modal.close();
         }
-        // Here you can show a notification or handle the declined call.
       }
+
     })
 
 
@@ -121,6 +124,9 @@ const IncomingCall = () => {
 
     const handleDecline = () => {
 
+      const peerConnection = peerConnectionRef.current;
+      const modal = document.getElementById('my_incoming_modal');
+
     // Turning off video and audio
     if(localVideoRef && localVideoRef.current.srcObject) {
       const stream = localVideoRef.current.srcObject;
@@ -132,17 +138,18 @@ const IncomingCall = () => {
       peerConnection.close();
     }      
 
-      const modal = document.getElementById('my_incoming_modal');
-      if (modal) modal.close();
+    setIsComingCall(false)
+
+    if (modal) modal.close();
 
       if(socket) {
-        setIsComingCall(false)
         socket.emit('rejectVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
       }
     }
 
 
     const handleAcceptCall = () => {
+      const peerConnection = peerConnectionRef.current;
       const modal = document.getElementById('my_incoming_modal');
       if (modal) modal.showModal();
       if(socket) {
