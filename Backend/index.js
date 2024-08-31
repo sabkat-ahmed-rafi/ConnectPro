@@ -261,17 +261,17 @@ async function run() {
 
 
       // NEW: Handling WebRTC Offer
-      socket.on("sendOffer", ({receiverSocketId, offer}) => {
-        io.to(receiverSocketId).emit("receiveOffer", { offer, from: socket.id });
+      socket.on("sendOffer", ({offer, receiverSocketId}) => {
+        io.to(receiverSocketId).emit("receiveOffer", { offer, callerSocketId: socket.id });
       });
       
       // NEW: Handling WebRTC Answer
-      socket.on("sendAnswer", ({callerSocketId, answer}) => {
+      socket.on("sendAnswer", ({answer, callerSocketId}) => {
         io.to(callerSocketId).emit("receiveAnswer", { answer, from: socket.id });
       });
       
       // NEW: Handling ICE Candidate Exchange
-      socket.on("sendIceCandidate", ({receiverSocketId, candidate}) => {
+      socket.on("sendIceCandidate", ({candidate, receiverSocketId}) => {
         io.to(receiverSocketId).emit("receiveIceCandidate", { candidate, from: socket.id });
       });
 
