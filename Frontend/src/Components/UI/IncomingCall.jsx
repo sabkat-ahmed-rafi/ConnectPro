@@ -11,7 +11,8 @@ const IncomingCall = () => {
   const { socket, isComingCall, callInfo, setIsComingCall, setCallStatus, callStatus } = useAuth()
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerConnectionRef = useRef(null);
+  const peerConnectionRef = useRef(new RTCPeerConnection());
+  const peerConnection = peerConnectionRef.current;
 
   const modal = document.getElementById('my_incoming_modal');
   
@@ -19,8 +20,6 @@ const IncomingCall = () => {
   useEffect(() => {
     console.log(isComingCall)
 
-    const peerConnection = new RTCPeerConnection();
-    peerConnectionRef.current = peerConnection;
 
 
     if(isComingCall) {
@@ -32,13 +31,44 @@ const IncomingCall = () => {
         localVideoRef.current.srcObject = stream;
       }
       // Add the stream to the peer connection
-      stream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, stream);
-      });
+      if (peerConnection.signalingState !== 'closed') {
+        stream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, stream);
+        });
+      }
+
     })
     .catch(error => {
       console.error('Error accessing media devices.', error);
     });
+
+
+      // Handle Ice candidate generation 
+      peerConnection.onicecandidate = (event) => {
+      if (event.candidate) {
+        socket.emit('sendIceCandidate', {
+          candidate: event.candidate, 
+          receiverSocketId: callInfo.callerSocketId,
+        });
+      }
+    };
+
+
+    // Handle incoming ICE candidates from the caller 
+    socket.on("receiveIceCandidate", ({ candidate }) => {
+      if (peerConnection.signalingState !== 'closed') {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    });
+
+    // Handle remote video stream from the caller
+    peerConnection.ontrack = (event) => {
+      if(remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+      }
+    };
+
+
     }
 
 
@@ -48,6 +78,15 @@ const IncomingCall = () => {
       if (rejectedCallData) {
         console.log(rejectedCallData)
         if (rejectedCallData.callStatus == "rejected") {
+    // Turning off video and audio
+    if(localVideoRef && localVideoRef.current.srcObject) {
+      const stream = localVideoRef.current.srcObject;
+      stream.getTracks().forEach(track => track.stop())
+    }
+    // Close the peer connection
+    if(peerConnection.signalingState !== "closed") {
+      peerConnection.close();
+    }          
           if (modal) modal.close();
           setIsComingCall(false)
         }
@@ -56,16 +95,22 @@ const IncomingCall = () => {
     })
 
 
-
+     // Handle incoming offer from the caller
+      socket?.on("receiveOffer", ({ offer, callerSocketId }) => {
+        console.log("Received offer from caller:", offer);
+        peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      });
 
 
       if (isComingCall== true) {
         if (modal) modal.showModal();
       }
 
-      // if(isComingCall == false) {
-      //   if (modal) modal.close();
-      // }
+      // return () => {
+      //   if (peerConnection.signalingState !== 'closed') {
+      //     peerConnection.close();
+      //   }
+      // };
 
     }, [socket, isComingCall]);
 
@@ -75,24 +120,52 @@ const IncomingCall = () => {
 
 
     const handleDecline = () => {
-      console.log("declined")
+
+    // Turning off video and audio
+    if(localVideoRef && localVideoRef.current.srcObject) {
+      const stream = localVideoRef.current.srcObject;
+      stream.getTracks().forEach(track => track.stop())
+    }
+
+    // Close the peer connection
+    if(peerConnection.signalingState !== "closed") {
+      peerConnection.close();
+    }      
+
       const modal = document.getElementById('my_incoming_modal');
       if (modal) modal.close();
+
       if(socket) {
         setIsComingCall(false)
         socket.emit('rejectVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
-    }
+      }
     }
 
 
     const handleAcceptCall = () => {
-      console.log("accepted")
       const modal = document.getElementById('my_incoming_modal');
       if (modal) modal.showModal();
-      // setIsComingCall(false)
       if(socket) {
         socket.emit('acceptVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
+
+     // Create and send the answer
+      peerConnection.createAnswer()
+      .then(answer => {
+        return peerConnection.setLocalDescription(answer);
+      })
+      .then(() => {
+        socket.emit("sendAnswer", {
+          answer: peerConnection.localDescription,
+          callerSocketId: callInfo.callerSocketId
+        });
+      })
+      .catch(error => {
+        console.error("Error creating or sending answer:", error);
+      });
+
+
     }
+
     }
 
 
@@ -127,7 +200,7 @@ const IncomingCall = () => {
             </button>
           </div>
         </section>
-        <section className="hidden">
+            <section className="flex space-x-3">
                <video ref={localVideoRef} autoPlay playsInline className='w-[300px]'></video>
                <video ref={remoteVideoRef} autoPlay playsInline className='w-[300px]'></video>
             </section>
@@ -137,36 +210,3 @@ const IncomingCall = () => {
 };
 
 export default IncomingCall;
-
-
-
-
-
-// WebRTC connection 
-
-
-// const peerConnection = new RTCPeerConnection();
-
-// // When ICE candidates are found, send them to the other peer
-// peerConnection.onicecandidate = (event) => {
-//   if (event.candidate) {
-//     socket.emit('sendIceCandidate', { candidate: event.candidate, callerSocketId });
-//   }
-// };
-
-// // Handle offer from the caller
-// socket.on('receiveOffer', ({ offer }) => {
-//   peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-//     .then(() => peerConnection.createAnswer())
-//     .then(answer => {
-//       return peerConnection.setLocalDescription(answer);
-//     })
-//     .then(() => {
-//       socket.emit('sendAnswer', { answer: peerConnection.localDescription, callerSocketId });
-//     });
-// });
-
-// // Receiving ICE candidates from the caller
-// socket.on('receiveIceCandidate', ({ candidate }) => {
-//   peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-// });

@@ -9,7 +9,36 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 
 
   useEffect(() => {
-    console.log(callInfo)
+
+    // Handle incoming answer from callee
+    socket.on("receiveAnswer", ({ answer }) => {
+      console.log("got the answer from callee");
+      if (peerConnection.signalingState !== 'closed') {
+        peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      }
+    });
+
+    // Handle Ice candidate generation 
+    peerConnection.oniceCandidate = (event) => {
+      if(event.candidate) {
+        socket.emit("sendIceCandidate", {candidate: event.candidate, receiverSocketId: selectedUser.socketId});
+      }
+    };
+
+    // Handle incoming ICE candidates from the callee
+    socket.on("receiveIceCandidate", ({ candidate }) => {
+      if (peerConnection.signalingState !== 'closed') {
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    });
+
+    // Handle the remote video stream from the callee
+    peerConnection.ontrack = (event) => {
+      if(remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0]
+      }
+    }
+
 
 
     if(socket) {
@@ -19,9 +48,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
           console.log(receivedCallData)
           if (receivedCallData.callStatus === "accepted") {
             setCallStatus("accepted")
-            console.log("accepted")
           }
-          // Here you can start the video call logic, and also update the call status in the database.
         }
       })
       socket.on("videoCallRejected", (declinedCallData) => {
@@ -29,9 +56,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
           console.log(declinedCallData)
           if (declinedCallData.callStatus === "declined") {
             setCallStatus("declined")
-            console.log("declined")
           }
-          // Here you can show a notification or handle the declined call.
         }
       })
     }
@@ -39,10 +64,25 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 
 
     if(callStatus == "declined") {
+
+    // Turning off video and audio
+    if(localVideoRef && localVideoRef.current.srcObject) {
+      const stream = localVideoRef.current.srcObject;
+      stream.getTracks().forEach(track => track.stop())
+    }
+
+    // Close the peer connection
+    if(peerConnection.signalingState !== "closed") {
+      peerConnection.close();
+    }
+
       const modal = document.getElementById('my_onGoing_modal');
       if (modal) modal.close();
       setCallStatus('')
     }
+
+
+
 
   }, [socket, callStatus]);
 
@@ -53,13 +93,30 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 
 
   const handleClose = () => {
-    console.log("declined");
-    setCallStatus('')
-      const modal = document.getElementById('my_onGoing_modal');
-        if (modal) modal.close();
-      if(socket) {
-        socket.emit('callerRejected', ({callerSocketId: selectedUser.socketId}))
+    
+
+    // Turning off video and audio
+    if(localVideoRef && localVideoRef.current.srcObject) {
+      const stream = localVideoRef.current.srcObject;
+      stream.getTracks().forEach(track => track.stop())
     }
+
+    // Close the peer connection
+    if(peerConnection.signalingState !== "closed") {
+      peerConnection.close();
+    }
+
+    
+    const modal = document.getElementById('my_onGoing_modal');
+    if (modal) modal.close();
+    
+    
+    if(socket) {
+      socket.emit('callerRejected', ({callerSocketId: selectedUser.socketId}))
+    }
+
+    setCallStatus('')
+
   }
 
 
@@ -77,7 +134,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
                 </form>
                 </div>
             </section>
-            <section className="hidden">
+            <section className="flex space-x-3">
                <video ref={localVideoRef} autoPlay playsInline className='w-[300px]'></video>
                <video ref={remoteVideoRef} autoPlay playsInline className='w-[300px]'></video>
             </section>
@@ -89,34 +146,3 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
 export default OngoingCall;
 
 
-
-// WebRTC connection 
-
-
-// const peerConnection = new RTCPeerConnection();
-
-// // When ICE candidates are found, send them to the other peer
-// peerConnection.onicecandidate = (event) => {
-//   if (event.candidate) {
-//     socket.emit('sendIceCandidate', { candidate: event.candidate, receiverSocketId });
-//   }
-// };
-
-// // Create an offer and send it to the callee
-// peerConnection.createOffer()
-//   .then(offer => {
-//     return peerConnection.setLocalDescription(offer);
-//   })
-//   .then(() => {
-//     socket.emit('sendOffer', { offer: peerConnection.localDescription, receiverSocketId });
-//   });
-
-// // Handle answer from the callee
-// socket.on('receiveAnswer', ({ answer }) => {
-//   peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-// });
-
-// // Receiving ICE candidates from the callee
-// socket.on('receiveIceCandidate', ({ candidate }) => {
-//   peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-// });

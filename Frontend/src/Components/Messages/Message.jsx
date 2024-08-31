@@ -16,7 +16,7 @@ import OngoingCall from "../UI/OngoingCall";
 
 const Message = () => {
 
-  const peerConnection = new RTCPeerConnection();
+  
 
   const {socket, user, callInfo, isComingCall} = useAuth()
   const [messageInput, setMessageInput] = useState('')
@@ -31,7 +31,7 @@ const Message = () => {
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerConnectionRef = useRef(null);
+  const peerConnectionRef = useRef(new RTCPeerConnection());
   
 
 
@@ -110,7 +110,7 @@ const Message = () => {
 
 
   const askedVideoPermission = () => {
-    peerConnectionRef.current = peerConnection;
+    const peerConnection = peerConnectionRef.current;
         // Capture video and audio
         navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(stream => {
@@ -128,7 +128,10 @@ const Message = () => {
           return peerConnection.setLocalDescription(offer);
         })
         .then(() => {
-          socket.emit('sendOffer', { offer: peerConnection.localDescription, receiverSocketId });
+          socket.emit('sendOffer', { 
+            offer: peerConnection.localDescription, 
+            receiverSocketId: selectedUser.socketId,
+           });
         })
         .catch(error => {
           console.error('Error accessing media devices.', error);
@@ -138,8 +141,7 @@ const Message = () => {
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
-    console.log("hitting man")
-     
+         
     askedVideoPermission()
     const modal = document.getElementById('my_onGoing_modal');
     if (modal) modal.showModal();
@@ -243,7 +245,7 @@ const Message = () => {
           </button>
         </section>
       </section>
-      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnection} />
+      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current} />
     </>
   );
 };
