@@ -148,8 +148,6 @@ const Message = ({setShowOutlet}) => {
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
-
-    if(callInfo != null) return alert(`User is in another call`);
          
     askedVideoPermission()
     const modal = document.getElementById('my_onGoing_modal');

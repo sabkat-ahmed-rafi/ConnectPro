@@ -117,7 +117,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, peerConnectio
     }
 
     // Close the peer connection
-    if(peerConnection.signalingState !== "closed") {
+    if(peerConnection && peerConnection.signalingState !== "closed") {
       peerConnection.close();
     }
 
