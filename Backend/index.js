@@ -179,6 +179,7 @@ async function run() {
     })
 
 
+    let activeCalls = {};
 
     // Socket.io events 
     io.on("connection", (socket) => {
@@ -223,38 +224,56 @@ async function run() {
       })
 
 
+   
 
       // Handling video call requests
       socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid, receiverPhoto, receiverName}) => {
-        console.log(callerName, receiverUid)
-        const callData = {
-          receiverUid,
-          receiverSocketId,
-          callerSocketId: socket.id,
-          callerName,
-          callerPhoto,
-          receiverName,
-          receiverPhoto,
-          timeStamp: new Date(Date.now()),
-          callType: 'video',
-          callId: Math.random().toString(36).substr(2, 9)
+
+        if(activeCalls[socket.id] || activeCalls[receiverSocketId]) {
+         socket.emit("userBusy", {message: "User is busy now."})
+         return 0
+        } else {
+          console.log(callerName, receiverUid)
+          const callData = {
+            receiverUid,
+            receiverSocketId,
+            callerSocketId: socket.id,
+            callerName,
+            callerPhoto,
+            receiverName,
+            receiverPhoto,
+            timeStamp: new Date(Date.now()),
+            callType: 'video',
+            callId: Math.random().toString(36).substr(2, 9)
+          }
+
+
+          activeCalls[socket.id] = true;
+          activeCalls[receiverSocketId] = true;
+          console.log(activeCalls)
+
+
+          // I can fetch the calldata, if I call the incomingCall route in a useEffect in any component.
+          io.to(receiverSocketId).emit("incomingCall", callData)
         }
-        // I can fetch the calldata, if I call the incomingCall route in a useEffect in any component.
-        io.to(receiverSocketId).emit("incomingCall", callData)
-      
+   
       })
 
       // Handling video call accept and rejects
       socket.on("acceptVideoCall", ({callerSocketId, callId}) => {
-        console.log( 'call receive:  ', callerSocketId)
         io.to(callerSocketId).emit("videoCallAccepted", { callId, callStatus: "accepted" })
       })
 
       socket.on("rejectVideoCall", ({callerSocketId, callId}) => {
+        console.log(activeCalls)
+        deleteActiveCallUser(callerSocketId)
+        deleteActiveCallUser(socket.id)
         io.to(callerSocketId).emit("videoCallRejected", { callId, callStatus: "declined" })
       })
 
       socket.on("callerRejected", ({callerSocketId}) => {
+        deleteActiveCallUser(callerSocketId)
+        deleteActiveCallUser(socket.id)
         io.to(callerSocketId).emit("callerVideoCallRejected", {callStatus: "rejected" })
       })
     
@@ -277,6 +296,9 @@ async function run() {
 
 
 
+      const deleteActiveCallUser = (socketId) => {
+        delete activeCalls[socketId];
+      }
 
 
 

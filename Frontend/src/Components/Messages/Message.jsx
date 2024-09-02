@@ -8,6 +8,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { IoMdVideocam } from "react-icons/io";
 import { IoCall } from "react-icons/io5";
 import OngoingCall from "../UI/OngoingCall";
+import toast from 'react-hot-toast';
 
 
 
@@ -18,10 +19,9 @@ const Message = ({setShowOutlet}) => {
 
   
 
-  const {socket, user, callInfo, isComingCall} = useAuth()
+  const {socket, user} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
-  const [isInCall, setInCall] = useState(false)
   
 
   const selectedUser = useLoaderData()
@@ -145,18 +145,47 @@ const Message = ({setShowOutlet}) => {
         });
   }
 
+  const proceedWithVideoCall = () => {
+      askedVideoPermission();
+  
+    const modal = document.getElementById('my_onGoing_modal');
+    if (modal) modal.showModal();
+  };
 
   // Now I will implement the video calling function and UI through modal.
   const handleVideoCall = () => {
-         
-    askedVideoPermission()
-    const modal = document.getElementById('my_onGoing_modal');
-    if (modal) modal.showModal();
 
+    let isBusy = false;
+      
     if(socket) {
       // sending info for video call 
       socket.emit("callUser", {receiverSocketId: selectedUser.socketId, callerName: user?.displayName, callerPhoto: user?.photoURL, receiverUid: selectedUser.uid, receiverPhoto: selectedUser.photo, receiverName: selectedUser.displayName})
+
+      // Checking If the user is busy or not 
+      socket.on("userBusy", ({ message }) => {
+        isBusy = true
+      })
     }
+
+    setTimeout(() => {
+      if (isBusy == true) {
+        isBusy = false;
+        toast.success('Busy Now', {
+          style: {
+            border: '1px solid #38BDF8',
+            padding: '16px',
+            color: '#1C2027',
+          },
+          icon: '📞',
+
+        });
+        return;
+      } else {
+        proceedWithVideoCall();
+      }
+    }, 100);
+    
+  
   }
 
   
