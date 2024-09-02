@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useAuth from "../../Hooks/useAuth";
 import { MdCallEnd } from "react-icons/md";
 import { FaVideo } from 'react-icons/fa';
@@ -12,6 +12,7 @@ const IncomingCall = () => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
+  const [isAccepted, setIsAccepted] = useState(false);
   
   const modal = document.getElementById('my_incoming_modal');
   
@@ -81,6 +82,7 @@ const IncomingCall = () => {
   if (rejectedCallData) {
         console.log(rejectedCallData)
     if (rejectedCallData.callStatus == "rejected") {
+      setIsAccepted(false);
     // Turning off video and audio
     if(localVideoRef && localVideoRef.current.srcObject) {
       const stream = localVideoRef.current.srcObject;
@@ -143,6 +145,7 @@ const IncomingCall = () => {
     if (modal) modal.close();
 
       if(socket) {
+        setIsAccepted(false)
         socket.emit('rejectVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
       }
     }
@@ -154,6 +157,7 @@ const IncomingCall = () => {
       if (modal) modal.showModal();
       if(socket) {
         socket.emit('acceptVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
+        setIsAccepted(true)
 
      // Create and send the answer
       peerConnection.createAnswer()
@@ -179,8 +183,8 @@ const IncomingCall = () => {
 
   return (
     <>
-      <dialog id="my_incoming_modal" className="flex lg:h-[502px] h-[400px] w-full flex-col p-4 bg-[#232124] text-white modal modal-bottom sm:modal-middle">
-        <section className="flex flex-col lg:space-y-60 space-y-40 modal-box">
+      <dialog id="my_incoming_modal" className="flex flex-col p-4 text-white modal modal-bottom sm:modal-middle">
+        <section className={`flex min-h-[500px] flex-col lg:space-y-60 space-y-56 modal-box ${isAccepted && "hidden"} bg-[#232124] rounded-lg`}>
           <div className="flex flex-col justify-center items-center">
             <div>
               <img
@@ -201,15 +205,16 @@ const IncomingCall = () => {
             </form>
             <button
               onClick={handleAcceptCall}
-              className="bg-green-500 p-4 rounded-full"
+              className="bg-green-500 p-4 rounded-full animate-bounce"
             >
               <FaVideo size={27} />
             </button>
           </div>
         </section>
-            <section className="flex space-x-3">
-               <video ref={localVideoRef} autoPlay playsInline className='w-[300px]'></video>
-               <video ref={remoteVideoRef} autoPlay playsInline className='w-[300px]'></video>
+            <section className={` ${!isAccepted && "hidden"} rounded-lg lg:min-w-[600px] md:min-w-[500px] max-h-[800px] flex-col p-0 modal-box overflow-hidden bg-[#232124]`}>
+            <video ref={remoteVideoRef} autoPlay playsInline className='lg:w-full md:w-full w-[400px] '></video>
+               <video ref={localVideoRef} autoPlay playsInline className='lg:rounded-lg md:rounded-lg lg:w-[200px] md:w-[150px] lg:absolute md:absolute lg:bottom-4 md:bottom-8 lg:right-2 md:right-2'></video>
+               <button onClick={handleDecline} className='bg-red-500 px-14 py-3 rounded-full lg:absolute md:absolute absolute bottom-[8px] left-[105px]  lg:bottom-5 md:bottom-5 lg:left-56 md:left-48'><MdCallEnd size={27} /></button>
             </section>
       </dialog>
     </>
