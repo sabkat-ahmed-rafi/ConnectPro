@@ -4,13 +4,13 @@ import { MdCallEnd } from "react-icons/md";
 import { FaVideo } from 'react-icons/fa';
 
 
-// I have to open the video and audio from both side when they call another callee 
 
 const IncomingCall = () => {
 
   const { socket, isComingCall, callInfo, setIsComingCall } = useAuth()
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const [isAccepted, setIsAccepted] = useState(false);
   
@@ -111,11 +111,7 @@ const IncomingCall = () => {
         if (modal) modal.showModal();
       }
 
-      // return () => {
-      //   if (peerConnection.signalingState !== 'closed') {
-      //     peerConnection.close();
-      //   }
-      // };
+
 
     }, [socket, isComingCall]);
 
@@ -215,6 +211,9 @@ const IncomingCall = () => {
             <video ref={remoteVideoRef} autoPlay playsInline className='lg:w-full md:w-full w-[400px] '></video>
                <video ref={localVideoRef} autoPlay playsInline className='lg:rounded-lg md:rounded-lg lg:w-[200px] md:w-[150px] lg:absolute md:absolute lg:bottom-4 md:bottom-8 lg:right-2 md:right-2'></video>
                <button onClick={handleDecline} className='bg-red-500 px-14 py-3 rounded-full lg:absolute md:absolute absolute bottom-[8px] left-[105px]  lg:bottom-5 md:bottom-5 lg:left-56 md:left-48'><MdCallEnd size={27} /></button>
+            </section>
+            <section className="hidden">
+              <audio ref={remoteAudioRef}></audio>
             </section>
       </dialog>
     </>
