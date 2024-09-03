@@ -15,11 +15,11 @@ import toast from 'react-hot-toast';
 
 // now i have to implement the previous route system but not previous one the it should be the home route 
 
-const Message = ({setShowOutlet}) => {
+const Message = () => {
 
   
 
-  const {socket, user} = useAuth()
+  const {socket, user, setShowOutlet} = useAuth()
   const [messageInput, setMessageInput] = useState('')
   const [message, setMessage] = useState([])
   
@@ -58,10 +58,13 @@ const Message = ({setShowOutlet}) => {
     
   }, [chats, selectedUser]);
 
-
+  
 
 
   useEffect(() => {
+
+    setShowOutlet(true);
+
     if(socket) {
         // Getting private messages from "pivate message" socket event 
         socket.on("private message", (newMessage) => {
@@ -69,6 +72,11 @@ const Message = ({setShowOutlet}) => {
             scrollToBottom();
         })
     }
+
+    return () => {
+      setShowOutlet(false);
+    }
+
 }, [socket, selectedUser])
 
 
@@ -233,7 +241,7 @@ const Message = ({setShowOutlet}) => {
     <>
        <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
         <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
-        <Link to={`/`} onClick={() => setShowOutlet(false)}><IoIosArrowBack /></Link>
+        <Link to={`/`}><IoIosArrowBack /></Link>
         <div className="w-8 lg:w-10 rounded-full">
                   <img 
                   className="rounded-full"

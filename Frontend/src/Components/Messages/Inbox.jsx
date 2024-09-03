@@ -35,7 +35,7 @@ const PlaceHolder = () => {
         <>
             <section className='mt-10 min-h-full flex'>
                 <MessageList onMessageClick={handleMessageClick} />
-                {showOutlet ? <Outlet setShowOutlet={setShowOutlet} /> : <PlaceHolder />}
+                {showOutlet ? <Outlet /> : <PlaceHolder />}
             </section>
         </>
     );
