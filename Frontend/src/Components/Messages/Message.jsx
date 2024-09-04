@@ -32,6 +32,7 @@ const Message = () => {
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const localAudioRef = useRef(null);
   const remoteAudioRef = useRef(null);
   
   const peerConnectionRef = useRef(null);
@@ -160,6 +161,10 @@ const Message = () => {
     } else if (callType == "audio") {
       navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
+        // Display the local video (self-view) on the webpage
+        if (localAudioRef.current) {
+          localAudioRef.current.srcObject = stream;
+        }
         // Add the stream to the peer connection
         stream.getTracks().forEach(track => {
           peerConnection.addTrack(track, stream);
@@ -361,7 +366,7 @@ const Message = () => {
           </button>
         </section>
       </section>
-      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current} remoteAudioRef={remoteAudioRef}  isAudioCall={isAudioCall} setIsAudioCall={setIsAudioCall} />
+      <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current} remoteAudioRef={remoteAudioRef} localAudioRef={localAudioRef}  isAudioCall={isAudioCall} setIsAudioCall={setIsAudioCall} />
     </>
   );
 };

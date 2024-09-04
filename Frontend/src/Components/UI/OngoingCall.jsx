@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdCallEnd } from 'react-icons/md';
 import useAuth from '../../Hooks/useAuth';
 
-const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRef, peerConnection, isAudioCall, setIsAudioCall}) => {
+const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRef, peerConnection, isAudioCall, setIsAudioCall, localAudioRef}) => {
 
   const { socket, setCallStatus, callStatus } = useAuth()
+  const [time, setTime] = useState(0)
   
 
 
@@ -68,20 +69,28 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
       })
     }
 
-
-
     if(callStatus == "declined") {
 
-    // Turning off video and audio
+    // Turning off local video stream
     if(localVideoRef?.current?.srcObject && !isAudioCall) {
       localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localVideoRef.current.srcObject = null;
     }
-
-    // Turning off audio 
+    // Turning off remote video stream
+    if(remoteVideoRef?.current?.srcObject && !isAudioCall) {
+      remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      remoteVideoRef.current.srcObject = null;
+    }    
+    // Turning off remote audio stream 
     if(remoteAudioRef?.current?.srcObject && isAudioCall) {
       remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
       remoteAudioRef.current.srcObject = null;
     }
+    // Turning off local audio stream
+    if(localAudioRef?.current?.srcObject && isAudioCall) {
+      localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localAudioRef.current.srcObject = null;
+    } 
 
     setCallStatus('')
     setIsAudioCall(false)
@@ -90,7 +99,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {
       peerConnection.close();
-    }
+      }
 
       const modal = document.getElementById('my_onGoing_modal');
       if (modal) modal.close();
@@ -106,7 +115,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
     };
 
 
-  }, [socket, callStatus, isAudioCall]);
+  }, [socket, callStatus, isAudioCall, selectedUser]);
 
 
  
@@ -117,17 +126,26 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
   const handleClose = () => {
     
 
-    // Turning off video and audio
+    // Turning off local video stream
     if(localVideoRef?.current?.srcObject && !isAudioCall) {
       localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localVideoRef.current.srcObject = null;
     }
-
-
-    // Turning off audio 
+    // Turning off remote video stream
+    if(remoteVideoRef?.current?.srcObject && !isAudioCall) {
+      remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      remoteVideoRef.current.srcObject = null;
+    }
+    // Turning off remote audio stream
     if(remoteAudioRef?.current?.srcObject && isAudioCall) {
       remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
       remoteAudioRef.current.srcObject = null;
     }
+    // Turning off local audio stream
+    if(localAudioRef?.current?.srcObject && isAudioCall) {
+      localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localAudioRef.current.srcObject = null;
+    }   
 
 
    
@@ -181,10 +199,11 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
                 </div>
                 <div className='modal-action flex justify-center lg:space-x-56 space-x-28'>
                 <form method="dialog">
-                <button onClick={handleClose} className='bg-purple-500 p-4 rounded-full'><MdCallEnd size={27} /></button>
+                <button onClick={handleClose} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></button>
                 </form>
                 </div>
-                <audio ref={remoteAudioRef} autoPlay playsInline></audio>
+                <audio ref={localAudioRef}></audio>
+                <audio ref={remoteAudioRef} autoPlay></audio>
             </section>
             </dialog>
         </>

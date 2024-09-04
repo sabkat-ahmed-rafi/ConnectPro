@@ -11,6 +11,7 @@ const IncomingCall = () => {
   const { socket, isComingCall, callInfo, setIsComingCall } = useAuth()
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const localAudioRef = useRef(null)
   const remoteAudioRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const [isAccepted, setIsAccepted] = useState(false);
@@ -34,6 +35,10 @@ const IncomingCall = () => {
       if(callInfo?.callType == "audio") {
         navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
+          // Display the local video (self-view) on the webpage
+          if (localAudioRef.current) {
+            localAudioRef.current.srcObject = stream;
+          }
           // Add the stream to the peer connection
           if (peerConnection.signalingState !== 'closed') {
             stream.getTracks().forEach(track => {
@@ -95,25 +100,32 @@ const IncomingCall = () => {
       });
     };
     
-
     }
-
-
-
 
     socket?.on("callerVideoCallRejected", (rejectedCallData) => {
   if (rejectedCallData) {
         
     if (rejectedCallData.callStatus == "rejected") {
       setIsAccepted(false);
-    // Turning off video and audio
+    // Turning off local video stream
     if(localVideoRef && localVideoRef.current.srcObject && callInfo?.callType == "video") {
       localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localVideoRef.current.srcObject = null;
     }
-    // Turning off audio 
+    // Turning off remote video stream
+    if (remoteVideoRef?.current?.srcObject && callInfo?.callType === "video") {
+      remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      remoteVideoRef.current.srcObject = null;
+    }
+    // Turning off remote video stream
     if(remoteAudioRef && remoteAudioRef.current.srcObject && callInfo?.callType == "audio") {
       remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
       remoteAudioRef.current.srcObject = null;
+    }
+    // Turning off local audio stream
+    if(localAudioRef?.current?.srcObject && callInfo?.callType == "audio") {
+      localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localAudioRef.current.srcObject = null;
     }
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {
@@ -128,9 +140,11 @@ const IncomingCall = () => {
 
 
      // Handle incoming offer from the caller
+     if(peerConnection.signalingState !== "closed") {
       socket?.on("receiveOffer", ({ offer, callerSocketId }) => {
         peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
       });
+    }
 
 
       if (isComingCall== true) {
@@ -138,60 +152,58 @@ const IncomingCall = () => {
       }
 
 
+      return () => {
+        socket?.off("receiveOffer");
+        socket?.off("receiveIceCandidate");
+        socket?.off("callerVideoCallRejected");
+      };
 
     }, [socket, isComingCall, callInfo]);
 
 
 
-    useEffect(() => {
-      return () => {
-
-    // Clean up streams and peer connection
-    if (localVideoRef.current?.srcObject) {
-      localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
-      localVideoRef.current.srcObject = null;
-    }
-
-    if (remoteAudioRef.current?.srcObject) {
-      remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
-      remoteAudioRef.current.srcObject = null;
-    }
-
-    if (peerConnectionRef.current) {
-      if (peerConnectionRef.current.signalingState !== 'closed') {
-        peerConnectionRef.current.close();
-      }
-      peerConnectionRef.current = null;
-    }
-
-        socket?.off("receiveOffer");
-        socket?.off("receiveIceCandidate");
-        socket?.off("callerVideoCallRejected");
-      };
-    }, [socket]);
 
 
 
+
+
+
+
+
+
+    
     const handleDecline = () => {
 
       const peerConnection = peerConnectionRef.current;
-      const modal = document.getElementById('my_incoming_modal');
 
-
-    // Turning off video and audio
+    // Turning off local video stream
     if(localVideoRef?.current?.srcObject && callInfo?.callType == "video") {
       localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localVideoRef.current.srcObject = null;
     }
-    // Turning off audio 
+    // Turning off remote video stream
+    if (remoteVideoRef?.current?.srcObject && callInfo?.callType === "video") {
+      remoteVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      remoteVideoRef.current.srcObject = null;
+    }
+    // Turning off remote audio stream
     if(remoteAudioRef?.current?.srcObject && callInfo?.callType == "audio") {
-      remoteAudioRef.current.srcObject.getTracks().forEach(track => console.log(track.stop()));
+      remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
       remoteAudioRef.current.srcObject = null;
     }
+    // Turning off local audio stream
+    if(localAudioRef?.current?.srcObject && callInfo?.callType == "audio") {
+      localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localAudioRef.current.srcObject = null;
+    }
+
     
+
 
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {
       peerConnection.close();
+      peerConnectionRef.current = null;
     }      
 
     setIsComingCall(false)
@@ -207,7 +219,6 @@ const IncomingCall = () => {
 
     const handleAcceptCall = () => {
       const peerConnection = peerConnectionRef.current;
-      const modal = document.getElementById('my_incoming_modal');
       if (modal) modal.showModal();
       if(socket) {
         socket.emit('acceptVideoCall', ({callerSocketId: callInfo.callerSocketId, callId: callInfo.callId}))
@@ -286,6 +297,7 @@ const IncomingCall = () => {
                 <button onClick={handleDecline} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></button>
                 </form>
                 </div>
+                <audio ref={localAudioRef}></audio>
                 <audio ref={remoteAudioRef} autoPlay></audio>
             </section>
       </dialog>

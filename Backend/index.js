@@ -227,7 +227,7 @@ async function run() {
    
 
       // Handling video call requests
-      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid, receiverPhoto, receiverName}) => {
+      socket.on("callUser", ({receiverSocketId, callerName, callerPhoto, receiverUid, receiverPhoto, receiverName, callType}) => {
 
         if(activeCalls[socket.id] || activeCalls[receiverSocketId]) {
          socket.emit("userBusy", {message: "User is busy now."})
@@ -243,14 +243,13 @@ async function run() {
             receiverName,
             receiverPhoto,
             timeStamp: new Date(Date.now()),
-            callType: 'video',
+            callType,
             callId: Math.random().toString(36).substr(2, 9)
           }
 
 
           activeCalls[socket.id] = true;
           activeCalls[receiverSocketId] = true;
-          console.log(activeCalls)
 
 
           // I can fetch the calldata, if I call the incomingCall route in a useEffect in any component.
@@ -304,7 +303,6 @@ async function run() {
 
       // Handling public chat messages
       socket.on("public message", (msg) => {
-        console.log(`message from ${socket.id} : ${msg}`)
         io.emit("public message", msg)
       })
 
