@@ -42,7 +42,6 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
         if (track.kind === "video") {
           if (remoteVideoRef.current) remoteVideoRef.current.srcObject = event.streams[0];
         } else if (track.kind === "audio") {
-          console.log(event.streams[0])
           if (remoteAudioRef.current) remoteAudioRef.current.srcObject = event.streams[0];
         }
       });
@@ -51,26 +50,25 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
 
 
 
-    if(socket) {
-
-      socket.on("videoCallAccepted", (receivedCallData) => {
-        if (receivedCallData) {
-          if (receivedCallData.callStatus === "accepted") {
-            setCallStatus("accepted")
-          }
+  if(socket) {
+    socket.on("videoCallAccepted", (receivedCallData) => {
+      if (receivedCallData) {
+        if (receivedCallData.callStatus === "accepted") {
+          setCallStatus("accepted")
         }
-      })
-      socket.on("videoCallRejected", (declinedCallData) => {
-        if (declinedCallData) {
-          if (declinedCallData.callStatus === "declined") {
-            setCallStatus("declined")
-          }
+      }
+    })
+    socket.on("videoCallRejected", (declinedCallData) => {
+      if (declinedCallData) {
+        if (declinedCallData.callStatus === "declined") {
+          setCallStatus("declined")
         }
-      })
-    }
-
-    if(callStatus == "declined") {
-
+      }
+    })
+  }
+  
+  if(callStatus == "declined") {
+    
     // Turning off local video stream
     if(localVideoRef?.current?.srcObject && !isAudioCall) {
       localVideoRef.current.srcObject.getTracks().forEach(track => track.stop());
@@ -91,23 +89,32 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
       localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
       localAudioRef.current.srcObject = null;
     } 
-
+    
     setCallStatus('')
     setIsAudioCall(false)
-
-
+    setTime(0);
+    
+    
     // Close the peer connection
     if(peerConnection.signalingState !== "closed") {
       peerConnection.close();
-      }
-
-      const modal = document.getElementById('my_onGoing_modal');
-      if (modal) modal.close();
     }
+    
+    const modal = document.getElementById('my_onGoing_modal');
+    if (modal) modal.close();
+  }
+  
+  let timer;
+  if(callStatus === 'accepted') {
+    timer = setInterval(() => {
+        setTime(prevTime => prevTime + 1)
+      }, 1000);
+    } 
 
 
 
     return () => {
+      clearInterval(timer)
       socket.off("receiveAnswer");
       socket.off("receiveIceCandidate");
       socket.off("videoCallAccepted");
@@ -118,7 +125,13 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
   }, [socket, callStatus, isAudioCall, selectedUser]);
 
 
- 
+ const formatTime = (time) => {
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${hours > 0 ? `${hours}:` : ''}${minutes < 10 && hours > 0 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+
+ }
 
 
 
@@ -157,6 +170,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
 
     setCallStatus('')
     setIsAudioCall(false)
+    setTime(0);
     
     const modal = document.getElementById('my_onGoing_modal');
     if (modal) modal.close();
@@ -181,7 +195,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
                 </div>
                 <div className='modal-action flex justify-center lg:space-x-56 space-x-28'>
                 <form method="dialog">
-                <button onClick={handleClose} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></button>
+                <button onClick={handleClose} className='bg-red-500 p-4 rounded-full saturate-150'><MdCallEnd size={27} /></button>
                 </form>
                 </div>
             </section>
@@ -192,14 +206,15 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
                <button onClick={handleClose} className='bg-red-500 px-14 py-3 rounded-full lg:absolute md:absolute absolute bottom-[8px] left-[105px]  lg:bottom-5 md:bottom-5 lg:left-56 md:left-48'><MdCallEnd size={27} /></button>
             </section>
             {/* UI will be shown after Caller receives the Audio call  */}
-            <section className={`flex ${callStatus == '' && "hidden"} flex-col lg:space-y-60 space-y-56 modal-box ${!isAudioCall && "hidden"} bg-[#232124] rounded-lg`}>
+            <section className={`flex ${callStatus == '' && "hidden"} flex-col lg:space-y-60 space-y-48 modal-box ${!isAudioCall && "hidden"} bg-[#232124] rounded-lg`}>
                <div className='flex flex-col justify-center items-center'>
                 <div><img className='w-18 rounded-full' src={selectedUser?.photo} alt="Profile Picture" />      </div>     
                   <h1 className='text-2xl'>{selectedUser?.userName}</h1>
+                  <h3 className='text-lg'>{formatTime(time)}</h3>
                 </div>
                 <div className='modal-action flex justify-center lg:space-x-56 space-x-28'>
                 <form method="dialog">
-                <button onClick={handleClose} className='bg-red-500 p-4 rounded-full'><MdCallEnd size={27} /></button>
+                <button onClick={handleClose} className='bg-red-500 p-4 rounded-full saturate-150'><MdCallEnd size={27} /></button>
                 </form>
                 </div>
                 <audio ref={localAudioRef}></audio>
