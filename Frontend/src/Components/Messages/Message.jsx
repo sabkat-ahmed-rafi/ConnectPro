@@ -44,7 +44,6 @@ const Message = () => {
   queryKey: ["chats", user?.email, receiverEmail],
   queryFn: async () => {
     const {data} = await axiosSecure.get(`/messages?senderEmail=${user?.email}&receiverEmail=${receiverEmail}`)
-    console.log(chats);
     return data
   },
   refetchInterval: 5000,

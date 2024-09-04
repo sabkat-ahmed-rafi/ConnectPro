@@ -114,15 +114,9 @@ const Authentication = ({children, navigate}) => {
                 if(data) {
                     setIsComingCall(true) 
                     setCallInfo(data)
-                    console.log(data)
             }
             });
             
-            // if(isComingCall) {
-            //     setTimeout(() => {
-            //         setIsComingCall(false)
-            //     }, 5000);
-            // }
 
     
         return () => {
