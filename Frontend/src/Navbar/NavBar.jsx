@@ -24,7 +24,7 @@ const NavBar = () => {
   return (
     <>
       <section className="pt-[20px] text-black">
-        <div className="navbar bg-base-100 shadow-lg shadow-sky-400  mx-auto rounded-lg border lg:w-[85%] w-[90%] border-sky-400">
+        <div className="navbar bg-base-100 shadow-lg shadow-sky-400 mx-auto  rounded-lg border lg:w-[85%] w-[90%] md:w-[80%] border-sky-400 ">
           <div className="navbar-start">
             <div className="dropdown">
               <div
@@ -34,7 +34,7 @@ const NavBar = () => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -49,14 +49,14 @@ const NavBar = () => {
               </div>
               <ul
                 tabIndex={0}
-                className="menu font-semibold space-y-2 menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+                className="menu font-semibold space-y-2 menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-3 shadow"
               >
                 {li}
               </ul>
             </div>
             <Link
               to={"/"}
-              className="btn btn-ghost hover:bg-white text-3xl gap-0"
+              className="btn btn-ghost pl-0 lg:pl-4  hover:bg-white lg:text-3xl text-[22px] gap-0"
             >
               <span className="font-bold text-blue-500">Connect</span>
               <span className="text-lg">Pro</span>
@@ -85,11 +85,11 @@ const NavBar = () => {
                 <li><Link onClick={handleLogOut} >Logout</Link></li>
               </ul>
             </div>
-           : <div className="space-x-5 ">
+           : <div className="space-x-3 lg:space-x-5 ">
               <Link
               to={"/login"}
               href="#_"
-              className="rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300"
+              className="rounded lg:px-5 px-3 lg:py-1.5 py-1 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300"
             >
               <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
               <span className="relative">Login</span>
@@ -97,7 +97,7 @@ const NavBar = () => {
             <Link
               to={"/register"}
               href="#_"
-              className="rounded px-5 py-1.5 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-400 transition-all ease-out duration-300"
+              className="rounded  lg:px-5 px-3 lg:py-1.5 py-1 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-400 transition-all ease-out duration-300"
             >
               <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
               <span className="relative">Sign in</span>
