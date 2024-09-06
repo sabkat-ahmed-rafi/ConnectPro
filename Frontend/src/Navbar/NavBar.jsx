@@ -8,8 +8,7 @@ const NavBar = () => {
     <>
       <NavLink to={"/"}> <motion.p whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.p> </NavLink>
       <NavLink to={"/inbox"}> <motion.p whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Messages</motion.p> </NavLink>
-      <NavLink to={"/about"}>about</NavLink>
-      <NavLink to={"/contacts"}>contact</NavLink>
+      <NavLink to={"https://www.linkedin.com/in/sabkat-ahmed-rafi/"} target="_blank" >Contact</NavLink>
     </>
   );
 
@@ -83,15 +82,12 @@ const NavBar = () => {
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-md">
-                <li><Link to={'/profile'}>Profile</Link></li>
-                <li><Link to={'/settings'}>Settings</Link></li>
                 <li><Link onClick={handleLogOut} >Logout</Link></li>
               </ul>
             </div>
            : <div className="space-x-3 lg:space-x-5 ">
               <Link
               to={"/login"}
-              href="#_"
               className="rounded lg:px-5 px-3 lg:py-1.5 py-1 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-600 transition-all ease-out duration-300"
             >
               <span className="absolute right-0  transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
@@ -99,7 +95,6 @@ const NavBar = () => {
             </Link>
             <Link
               to={"/register"}
-              href="#_"
               className="rounded  lg:px-5 px-3 lg:py-1.5 py-1 overflow-hidden group bg-sky-500 relative hover:bg-gradient-to-r hover:from-sky-500 hover:to-indigo-400 text-white hover:ring-indigo-400 transition-all ease-out duration-300"
             >
               <span className="absolute right-0  transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>

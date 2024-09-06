@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { axiosSecure } from "../../Hooks/useAxiosSecure";
 import { Link } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
+import * as motion from "framer-motion/client"
 
 const MessageList = ({ onMessageClick }) => {
 
@@ -36,12 +37,11 @@ const MessageList = ({ onMessageClick }) => {
   }
  
 
-  // now I have to conditionally show the each user for the conversation functionality.
 
   return (
     <>
     {/* conversation appearence  */}
-      <section className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-slate-300 p-4 border-r-2 border-sky-500">
+      <motion.section initial={{ y: -450 }} animate={{ y: -0 }} className=" w-[25%] lg:h-[502px] h-[400px] flex flex-col overflow-y-scroll bg-slate-300 p-4 border-r-2 border-sky-500">
         <section className="mb-4">
             <input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="Search messenger" name="search" className="input input-info input-bordered lg:w-full w-[56px] p-1 lg:p-3" />
         </section>
@@ -59,7 +59,7 @@ const MessageList = ({ onMessageClick }) => {
         </div>
       </Link>)
        }
-      </section>
+      </motion.section>
 
  {/* search appearence  */}
 <section className={`${search ? "visible" : "hidden"} w-[25%] lg:h-[302px] h-[280px] flex flex-col overflow-y-scroll absolute bg-white shadow-lg top-[150px] lg:top-[200px] left-[100px] lg:left-[200px] z-10 p-4 rounded-xl space-y-3`}>
