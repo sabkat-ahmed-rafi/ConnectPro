@@ -15,6 +15,7 @@ import {
 import Inbox from "./Components/Messages/Inbox";
 import Message from "./Components/Messages/Message";
 import IncomingCall from "./Components/UI/IncomingCall";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/inbox",
-    element: <Inbox />,
+    element: <ProtectedRoute><Inbox /></ProtectedRoute>,
     children: [
       {
         path: "/inbox/message/:uid",

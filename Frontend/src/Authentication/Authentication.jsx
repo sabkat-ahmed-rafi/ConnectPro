@@ -68,6 +68,7 @@ const Authentication = ({children, navigate}) => {
             setUser(currentUser)
             if(currentUser) {
                 setUser(currentUser)
+                setLoading(false)
                 saveTokenToCookie(currentUser.email)
                 console.log(currentUser.email)
 

@@ -8,7 +8,7 @@ const NavBar = () => {
     <>
       <NavLink to={"/"}> <motion.p whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.p> </NavLink>
       <NavLink to={"/inbox"}> <motion.p whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Messages</motion.p> </NavLink>
-      <NavLink to={"https://www.linkedin.com/in/sabkat-ahmed-rafi/"} target="_blank" >Contact</NavLink>
+      <NavLink to={"https://www.linkedin.com/in/sabkat-ahmed-rafi/"} target="_blank" ><motion.p whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Contact</motion.p></NavLink>
     </>
   );
 
