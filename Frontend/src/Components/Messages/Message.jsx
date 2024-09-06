@@ -9,6 +9,8 @@ import { IoMdVideocam } from "react-icons/io";
 import { IoCall } from "react-icons/io5";
 import OngoingCall from "../UI/OngoingCall";
 import toast from 'react-hot-toast';
+import * as motion from "framer-motion/client"
+
 
 
 
@@ -313,7 +315,7 @@ const Message = () => {
   
   return (
     <>
-       <section className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
+       <motion.section initial={{ x: 250 }} animate={{ x: 0 }} className="flex lg:h-[502px] h-[400px] w-full flex-col overflow-y-scroll p-4 bg-slate-100">
         <section className="sticky top-0 z-10 bg-slate-300 border-2 shadow-md shadow-sky-400  border-sky-400 rounded-md p-2 flex items-center space-x-4">
         <Link to={`/`}><IoIosArrowBack /></Link>
         <div className="w-8 lg:w-10 rounded-full">
@@ -365,7 +367,7 @@ const Message = () => {
             <IoMdSend size={30} />
           </button>
         </section>
-      </section>
+      </motion.section>
       <OngoingCall selectedUser={selectedUser} localVideoRef={localVideoRef} remoteVideoRef={remoteVideoRef} peerConnectionRef={peerConnectionRef} peerConnection={peerConnectionRef.current} remoteAudioRef={remoteAudioRef} localAudioRef={localAudioRef}  isAudioCall={isAudioCall} setIsAudioCall={setIsAudioCall} />
     </>
   );
