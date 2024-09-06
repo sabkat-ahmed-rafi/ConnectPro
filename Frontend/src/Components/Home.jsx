@@ -20,8 +20,8 @@ const Home = () => {
               loop={true}
             />
     </motion.div>
-    <div className='lg:flex md:hidden'>
-      <h1 className="lg:text-5xl text-[25px] font-thin lg:min-w-[650px] whitespace-nowrap italic relative"><Typewriter words={["Conversations made simple", "Connections made meaningful"]} loop={true} /></h1>
+    <div className='lg:flex flex-col md:hidden'>
+      <h1 className="lg:text-5xl text-[25px] font-thin lg:min-w-[650px]  whitespace-nowrap italic relative"><Typewriter words={["Conversations made simple", "Connections made meaningful"]} loop={true} /></h1>
       <motion.p initial={{ x: -250 }} animate={{ x: -0 }} className="py-6 lg:w-[400px] font-thin lg:text-lg text-md italic ">
         At ConnectPro, we believe communication should be simple and powerful. Join today and experience a new way of staying in touch.
       </motion.p>
