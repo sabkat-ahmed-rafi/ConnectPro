@@ -161,11 +161,11 @@ async function run() {
       const {uid, email, photo, userName, senderUid, senderEmail, senderPhoto, senderName } = req.body;
       if(email == senderEmail) return res.status(200).send({message: "you can't send message to yourself"})
         const query = { 
-          $and: [
-            { senderEmail: senderEmail },
-            { receiverEmail: senderEmail }
+          $or: [
+            { $and: [{ senderEmail: senderEmail }, { receiverEmail: email }] },
+            { $and: [{ senderEmail: email }, { receiverEmail: senderEmail }] }
           ]
-         };
+        };
       const conversation = {
         receiverUid: uid, 
         receiverEmail: email,
