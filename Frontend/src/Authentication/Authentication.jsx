@@ -72,7 +72,7 @@ const Authentication = ({children, navigate}) => {
                 saveTokenToCookie(currentUser.email)
                 console.log(currentUser.email)
 
-                const socketInstance = socketIOClient(import.meta.env.VITE_BACKEND_URL)
+                const socketInstance = socketIOClient(import.meta.env.VITE_BACKEND_URL, { transports: ['websocket'] })
 
                 socketInstance.on('connect', () => {
                     console.log(`socket connected : ${socketInstance.id}`)
