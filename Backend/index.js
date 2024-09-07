@@ -15,9 +15,11 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [`${process.env.FRONTEND_URL}`],
-    methods: ["GET", "HEAD"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
-  }
+  },
+  transports: ['websocket'],
 })
 
 const port = process.env.PORT || 3000;
@@ -29,8 +31,9 @@ app.use(cookieParser());
 
 app.use(cors({
   origin: [`${process.env.FRONTEND_URL}`],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-  optionSuccessStatus: 200
+  allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
