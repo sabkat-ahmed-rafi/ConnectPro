@@ -105,8 +105,10 @@ async function run() {
     app.get('/users', async (req, res) => {
       const search = req.query.search
 
+      const searchString = String(search || '');
+
       const query = { $or: [ 
-       { userName: { $regex: search, $options: 'i' } }
+       { userName: { $regex: searchString, $options: 'i' } }
       ] }
 
       const users = await usersCollection.find(query).toArray();
