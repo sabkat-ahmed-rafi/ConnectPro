@@ -32,10 +32,10 @@ const IncomingCall = () => {
           urls: 'stun:stun2.l.google.com:19302'
         },
         { 
-          urls: 'turn:turn.google.com:19305',
-          username: 'user',
-          credential: 'pass'
-         }
+          urls: 'turn:192.158.29.39:3478?transport=udp',
+          username: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+          credential: '28224511:1379330808'
+        }
       ]
     };
   
@@ -45,7 +45,7 @@ const IncomingCall = () => {
   }
   
   
-  console.log(callInfo?.callType)
+
 
   useEffect(() => {
     
@@ -93,6 +93,7 @@ const IncomingCall = () => {
 
 
       // Handle Ice candidate generation 
+      if(peerConnection !== null) {
       peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit('sendIceCandidate', {
@@ -101,12 +102,14 @@ const IncomingCall = () => {
         });
       }
     };
+    }
 
 
     // Handle incoming ICE candidates from the caller 
     socket.on("receiveIceCandidate", ({ candidate }) => {
       if (peerConnection.signalingState !== 'closed') {
-        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+        .catch(error => console.error('Error adding received ICE candidate in incoming', error));
       }
     });
 
@@ -288,7 +291,7 @@ const IncomingCall = () => {
   return (
     <>
       <dialog id="my_incoming_modal" className="flex flex-col p-4 text-white modal modal-bottom sm:modal-middle">
-        {/* This UI will be shown at the time when an incoming call will come   */}
+        {/* This UI will be shown at the time when an incoming call will come */}
         <section className={`flex min-h-[500px] flex-col lg:space-y-60 space-y-56 modal-box ${isAccepted && "hidden"} bg-[#232124] rounded-lg`}>
           <div className="flex flex-col justify-center items-center">
             <div>

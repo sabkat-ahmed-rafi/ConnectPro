@@ -135,10 +135,10 @@ const Message = () => {
           urls: 'stun:stun2.l.google.com:19302'
         },
         { 
-          urls: 'turn:turn.google.com:19305',
-          username: 'user',
-          credential: 'pass'
-         }
+          urls: 'turn:192.158.29.39:3478?transport=udp',
+          username: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+          credential: '28224511:1379330808'
+        }
       ]
     };
   
@@ -307,10 +307,10 @@ const Message = () => {
                   src={selectedUser.photo} />
         </div>
           <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
-          <div>
+          <div onClick={() => handleAudioCall()}>
           <IoCall className="rounded hover:text-blue-500" size={23} />
           </div>
-          <div>
+          <div onClick={handleVideoCall}>
           <IoMdVideocam className="rounded hover:text-blue-500" size={26} />
           </div>
         </section>
@@ -345,10 +345,7 @@ const Message = () => {
                   src={selectedUser.photo}/>
         </div>
           <h1 className="lg:text-base text-sm font-semibold">{selectedUser.userName}</h1>
-          <div onClick={() => {
-            
-            handleAudioCall()
-          } }>
+          <div onClick={() => handleAudioCall()}>
           <IoCall className="rounded hover:text-blue-500 cursor-pointer" size={23} />
           </div>
           <div onClick={handleVideoCall}>

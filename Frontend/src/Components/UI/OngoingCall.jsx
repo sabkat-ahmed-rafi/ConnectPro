@@ -21,7 +21,7 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
 
     // Handle Ice candidate generation 
     if(peerConnection !== null) {
-      peerConnection.oniceCandidate = (event) => {
+      peerConnection.onicecandidate = (event) => {
         if(event.candidate) {
           socket.emit("sendIceCandidate", {candidate: event.candidate, receiverSocketId: selectedUser.socketId});
         }
@@ -31,13 +31,15 @@ const OngoingCall = ({selectedUser, localVideoRef, remoteVideoRef, remoteAudioRe
     // Handle incoming ICE candidates from the callee
     socket.on("receiveIceCandidate", ({ candidate }) => {
       if (peerConnection.signalingState !== 'closed') {
-        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+        peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+        .catch(error => console.error('Error adding received ICE candidate in ongoing', error));
       }
     });
     
     // Handle the remote video and audio stream from the callee
  if(peerConnection !== null) {
         peerConnection.ontrack = (event) => {
+          console.log('Received track:', event.streams[0]);
       event.streams[0].getTracks().forEach((track) => {
         if (track.kind === "video") {
           if (remoteVideoRef.current) remoteVideoRef.current.srcObject = event.streams[0];
